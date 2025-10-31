@@ -1,0 +1,290 @@
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: logistica-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-logistica}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      POSTGRES_MULTIPLE_DATABASES: clientes_db,depositos_db,camiones_db,tarifas_db,solicitudes_db,rutas_db,keycloak_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logistica"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: logistica-keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: ${POSTGRES_USER:-logistica}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin123}
+      KC_HTTP_PORT: 8180
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+    ports:
+      - "8180:8180"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8180/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Microservicio de Clientes
+  clientes-service:
+    build:
+      context: ./clientes-service
+      dockerfile: Dockerfile
+    container_name: clientes-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/clientes_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Microservicio de Depósitos
+  depositos-service:
+    build:
+      context: ./depositos-service
+      dockerfile: Dockerfile
+    container_name: depositos-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/depositos_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Microservicio de Camiones
+  camiones-service:
+    build:
+      context: ./camiones-service
+      dockerfile: Dockerfile
+    container_name: camiones-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/camiones_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Microservicio de Tarifas
+  tarifas-service:
+    build:
+      context: ./tarifas-service
+      dockerfile: Dockerfile
+    container_name: tarifas-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tarifas_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Microservicio de Solicitudes
+  solicitudes-service:
+    build:
+      context: ./solicitudes-service
+      dockerfile: Dockerfile
+    container_name: solicitudes-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/solicitudes_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      CLIENTES_SERVICE_URL: http://clientes-service:8081
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+    ports:
+      - "8085:8085"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      clientes-service:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Microservicio de Rutas
+  rutas-service:
+    build:
+      context: ./rutas-service
+      dockerfile: Dockerfile
+    container_name: rutas-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rutas_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
+      SOLICITUDES_SERVICE_URL: http://solicitudes-service:8085
+      DEPOSITOS_SERVICE_URL: http://depositos-service:8082
+      CAMIONES_SERVICE_URL: http://camiones-service:8083
+      TARIFAS_SERVICE_URL: http://tarifas-service:8084
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+    ports:
+      - "8086:8086"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      solicitudes-service:
+        condition: service_healthy
+      depositos-service:
+        condition: service_healthy
+      camiones-service:
+        condition: service_healthy
+      tarifas-service:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CLIENTES_SERVICE_URL: http://clientes-service:8081
+      DEPOSITOS_SERVICE_URL: http://depositos-service:8082
+      CAMIONES_SERVICE_URL: http://camiones-service:8083
+      TARIFAS_SERVICE_URL: http://tarifas-service:8084
+      SOLICITUDES_SERVICE_URL: http://solicitudes-service:8085
+      RUTAS_SERVICE_URL: http://rutas-service:8086
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+    ports:
+      - "8080:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      clientes-service:
+        condition: service_healthy
+      depositos-service:
+        condition: service_healthy
+      camiones-service:
+        condition: service_healthy
+      tarifas-service:
+        condition: service_healthy
+      solicitudes-service:
+        condition: service_healthy
+      rutas-service:
+        condition: service_healthy
+    networks:
+      - logistica-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  logistica-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
