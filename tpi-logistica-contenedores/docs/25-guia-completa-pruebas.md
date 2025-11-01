@@ -138,8 +138,8 @@ docker-compose ps
 Abre tu navegador y verifica:
 
 - **API Gateway Health:** http://localhost:8080/actuator/health
-- **Keycloak Admin:** http://localhost:9090 (usuario: `admin`, password: `admin123`)
-- **Swagger Clientes:** http://localhost:8081/swagger-ui.html
+- **Keycloak Admin:** http://localhost:8180 (usuario: `admin`, password: `admin123`)
+- **Swagger Clientes:** http://localhost:8081/swagger-ui/index.html
 
 ---
 
@@ -147,7 +147,7 @@ Abre tu navegador y verifica:
 
 ### Paso 1: Acceder a Keycloak Admin Console
 
-1. Abre http://localhost:9090
+1. Abre http://localhost:8180
 2. Click en "Administration Console"
 3. Login: `admin` / `admin123`
 
@@ -501,13 +501,13 @@ docker-compose logs postgres
 | Servicio | URL | Descripción |
 |----------|-----|-------------|
 | API Gateway | http://localhost:8080 | Punto de entrada principal |
-| Keycloak Admin | http://localhost:9090 | Administración de usuarios |
-| Swagger Clientes | http://localhost:8081/swagger-ui.html | Documentación API Clientes |
-| Swagger Depósitos | http://localhost:8082/swagger-ui.html | Documentación API Depósitos |
-| Swagger Camiones | http://localhost:8083/swagger-ui.html | Documentación API Camiones |
-| Swagger Tarifas | http://localhost:8084/swagger-ui.html | Documentación API Tarifas |
-| Swagger Solicitudes | http://localhost:8085/swagger-ui.html | Documentación API Solicitudes |
-| Swagger Rutas | http://localhost:8086/swagger-ui.html | Documentación API Rutas |
+| Keycloak Admin | http://localhost:8180 | Administración de usuarios |
+| Swagger Clientes | http://localhost:8081/swagger-ui/index.html | Documentación API Clientes |
+| Swagger Depósitos | http://localhost:8082/swagger-ui/index.html | Documentación API Depósitos |
+| Swagger Camiones | http://localhost:8083/swagger-ui/index.html | Documentación API Camiones |
+| Swagger Tarifas | http://localhost:8084/swagger-ui/index.html | Documentación API Tarifas |
+| Swagger Solicitudes | http://localhost:8085/swagger-ui/index.html | Documentación API Solicitudes |
+| Swagger Rutas | http://localhost:8086/swagger-ui/index.html | Documentación API Rutas |
 
 ---
 
