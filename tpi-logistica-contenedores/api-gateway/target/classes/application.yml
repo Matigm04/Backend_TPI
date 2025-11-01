@@ -1,0 +1,112 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # Clientes Service
+        - id: clientes-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/clientes/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: clientesCircuitBreaker
+                fallbackUri: forward:/fallback/clientes
+
+        # Depositos Service
+        - id: depositos-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/depositos/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: depositosCircuitBreaker
+                fallbackUri: forward:/fallback/depositos
+
+        # Camiones Service
+        - id: camiones-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/camiones/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: camionesCircuitBreaker
+                fallbackUri: forward:/fallback/camiones
+
+        # Tarifas Service
+        - id: tarifas-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/tarifas/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: tarifasCircuitBreaker
+                fallbackUri: forward:/fallback/tarifas
+
+        # Solicitudes Service
+        - id: solicitudes-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/solicitudes/**,/api/contenedores/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: solicitudesCircuitBreaker
+                fallbackUri: forward:/fallback/solicitudes
+
+        # Rutas Service
+        - id: rutas-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/rutas/**,/api/tramos/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: rutasCircuitBreaker
+                fallbackUri: forward:/fallback/rutas
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            exposedHeaders:
+              - Authorization
+            maxAge: 3600
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    com.logistica: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

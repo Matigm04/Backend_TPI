@@ -42,12 +42,6 @@ services:
         condition: service_healthy
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8180/health/ready"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
 
   # Microservicio de Clientes
   clientes-service:
@@ -68,15 +62,9 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+        condition: service_started
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   # Microservicio de Depósitos
   depositos-service:
@@ -97,15 +85,9 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+        condition: service_started
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   # Microservicio de Camiones
   camiones-service:
@@ -126,15 +108,9 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+        condition: service_started
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   # Microservicio de Tarifas
   tarifas-service:
@@ -155,15 +131,9 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+        condition: service_started
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   # Microservicio de Solicitudes
   solicitudes-service:
@@ -185,17 +155,11 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+        condition: service_started
       clientes-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   # Microservicio de Rutas
   rutas-service:
@@ -221,23 +185,17 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+        condition: service_started
       solicitudes-service:
-        condition: service_healthy
+        condition: service_started
       depositos-service:
-        condition: service_healthy
+        condition: service_started
       camiones-service:
-        condition: service_healthy
+        condition: service_started
       tarifas-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   # API Gateway
   api-gateway:
@@ -259,27 +217,21 @@ services:
       - "8080:8080"
     depends_on:
       keycloak:
-        condition: service_healthy
+        condition: service_started
       clientes-service:
-        condition: service_healthy
+        condition: service_started
       depositos-service:
-        condition: service_healthy
+        condition: service_started
       camiones-service:
-        condition: service_healthy
+        condition: service_started
       tarifas-service:
-        condition: service_healthy
+        condition: service_started
       solicitudes-service:
-        condition: service_healthy
+        condition: service_started
       rutas-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - logistica-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
 networks:
   logistica-network:
