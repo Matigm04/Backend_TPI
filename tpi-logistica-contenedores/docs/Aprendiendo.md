@@ -40,3 +40,6 @@ En Swagger UI puedes configurar el token JWT obtenido de Keycloak para probar en
 ----------------------------------------------------------------------------------------------------------------------------
 
 El comando docker-compose logs -f es el comando de diagnóstico correcto. Te conectaste a la "transmisión en vivo" de los logs de todos tus contenedores.
+
+---------------------------------------------------------------------------------
+
