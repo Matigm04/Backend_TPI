@@ -3,7 +3,7 @@ spring:
     name: rutas-service
   
   profiles:
-    active: dev
+    active: docker
   
   jpa:
     hibernate:
@@ -12,7 +12,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
 
 server:
   port: 8086
@@ -23,16 +29,16 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-# URLs de otros microservicios
+# URLs de otros microservicios (usando nombres de servicios Docker)
 services:
   solicitudes:
-    url: http://localhost:8085
+    url: http://solicitudes-service:8085
   depositos:
-    url: http://localhost:8082
+    url: http://depositos-service:8082
   camiones:
-    url: http://localhost:8083
+    url: http://camiones-service:8083
   tarifas:
-    url: http://localhost:8084
+    url: http://tarifas-service:8084
 
 google:
   maps:
@@ -41,7 +47,7 @@ google:
     enabled: ${GOOGLE_MAPS_ENABLED:false}
 
 ---
-# Perfil de desarrollo con H2
+# 2. PERFIL 'dev' (Para desarrollo local, sin Docker)
 spring:
   config:
     activate:
@@ -59,19 +65,28 @@ spring:
       path: /h2-console
   
   jpa:
+    hibernate:
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
 
 ---
-# Perfil de producción con PostgreSQL
+# 3. PERFIL 'docker'
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: docker
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/rutasdb
+    url: ${SPRING_DATASOURCE_URL}
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

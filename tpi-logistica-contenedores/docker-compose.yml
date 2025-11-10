@@ -37,6 +37,12 @@ services:
       KC_HTTP_ENABLED: true
     ports:
       - "8180:8180"
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 10 bash -c '</dev/tcp/localhost/8180' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,15 +60,15 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/clientes_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:
       - "8081:8081"
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     networks:
       - logistica-network
 
@@ -77,15 +83,15 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/depositos_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:
       - "8082:8082"
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     networks:
       - logistica-network
 
@@ -100,15 +106,15 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/camiones_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:
       - "8083:8083"
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     networks:
       - logistica-network
 
@@ -123,15 +129,15 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tarifas_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:
       - "8084:8084"
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     networks:
       - logistica-network
 
@@ -147,15 +153,15 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-logistica}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-logistica123}
       CLIENTES_SERVICE_URL: http://clientes-service:8081
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:
       - "8085:8085"
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
       clientes-service:
         condition: service_started
     networks:
@@ -177,15 +183,15 @@ services:
       CAMIONES_SERVICE_URL: http://camiones-service:8083
       TARIFAS_SERVICE_URL: http://tarifas-service:8084
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:
       - "8086:8086"
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
       solicitudes-service:
         condition: service_started
       depositos-service:
@@ -211,13 +217,13 @@ services:
       TARIFAS_SERVICE_URL: http://tarifas-service:8084
       SOLICITUDES_SERVICE_URL: http://solicitudes-service:8085
       RUTAS_SERVICE_URL: http://rutas-service:8086
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:
       - "8080:8080"
     depends_on:
       keycloak:
-        condition: service_started
+        condition: service_healthy
       clientes-service:
         condition: service_started
       depositos-service:

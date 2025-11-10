@@ -2,8 +2,10 @@ spring:
   application:
     name: clientes-service
   
+  # 1. PERFIL POR DEFECTO:
+  # Cambiamos el perfil por defecto a 'docker'
   profiles:
-    active: dev
+    active: docker
   
   jpa:
     show-sql: true
@@ -12,11 +14,19 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Estas son las variables que SÍ se están leyendo de docker-compose
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
 
 server:
   port: 8081
 
+# Configuración de Swagger / OpenAPI
 springdoc:
   api-docs:
     path: /api-docs
@@ -25,7 +35,7 @@ springdoc:
     enabled: true
 
 ---
-# Perfil de desarrollo con H2
+# 2. PERFIL 'dev' (Para desarrollo local, sin Docker)
 spring:
   config:
     activate:
@@ -50,18 +60,24 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
 
 ---
-# Perfil de producción con PostgreSQL
+# 3. PERFIL 'docker' (¡EL NUEVO!)
+# Este perfil se activa con 'docker' y usa las variables de docker-compose
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: docker
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/clientesdb
+    # Lee la URL de la base de datos desde la variable de entorno
+    url: ${SPRING_DATASOURCE_URL}
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    # Lee el usuario y contraseña desde las variables de entorno
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

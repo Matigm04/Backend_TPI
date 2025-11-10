@@ -4,12 +4,23 @@ server:
 spring:
   application:
     name: api-gateway
+  
+  profiles:
+    active: docker
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
+  
   cloud:
     gateway:
       routes:
         # Clientes Service
         - id: clientes-service
-          uri: http://localhost:8081
+          uri: ${CLIENTES_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/clientes/**
           filters:
@@ -20,7 +31,7 @@ spring:
 
         # Depositos Service
         - id: depositos-service
-          uri: http://localhost:8082
+          uri: ${DEPOSITOS_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/depositos/**
           filters:
@@ -31,7 +42,7 @@ spring:
 
         # Camiones Service
         - id: camiones-service
-          uri: http://localhost:8083
+          uri: ${CAMIONES_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/api/camiones/**
           filters:
@@ -42,7 +53,7 @@ spring:
 
         # Tarifas Service
         - id: tarifas-service
-          uri: http://localhost:8084
+          uri: ${TARIFAS_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/api/tarifas/**
           filters:
@@ -53,7 +64,7 @@ spring:
 
         # Solicitudes Service
         - id: solicitudes-service
-          uri: http://localhost:8085
+          uri: ${SOLICITUDES_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/api/solicitudes/**,/api/contenedores/**
           filters:
@@ -64,7 +75,7 @@ spring:
 
         # Rutas Service
         - id: rutas-service
-          uri: http://localhost:8086
+          uri: ${RUTAS_SERVICE_URL:http://localhost:8086}
           predicates:
             - Path=/api/rutas/**,/api/tramos/**
           filters:
