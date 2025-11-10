@@ -1,0 +1,17 @@
+com\logistica\clientes\model\Cliente.class
+com\logistica\clientes\service\ClienteService.class
+com\logistica\clientes\exception\ErrorResponse.class
+com\logistica\clientes\repository\ClienteRepository.class
+com\logistica\clientes\dto\ClienteResponseDTO$ClienteResponseDTOBuilder.class
+com\logistica\clientes\dto\ClienteRequestDTO$ClienteRequestDTOBuilder.class
+com\logistica\clientes\exception\ErrorResponse$ErrorResponseBuilder.class
+com\logistica\clientes\config\SecurityConfig.class
+com\logistica\clientes\config\OpenApiConfig.class
+com\logistica\clientes\exception\GlobalExceptionHandler.class
+com\logistica\clientes\controller\ClienteController.class
+com\logistica\clientes\exception\ClienteNotFoundException.class
+com\logistica\clientes\dto\ClienteRequestDTO.class
+com\logistica\clientes\exception\DuplicateClienteException.class
+com\logistica\clientes\ClientesServiceApplication.class
+com\logistica\clientes\dto\ClienteResponseDTO.class
+com\logistica\clientes\model\Cliente$ClienteBuilder.class

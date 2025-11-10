@@ -199,8 +199,8 @@ Abre tu navegador y verifica:
 1. Click en "Users" → "Add user"
 2. Username: `cliente1`
 3. Email: `cliente1@test.com`
-4. First name: `Juan`
-5. Last name: `Pérez`
+4. First name: `Matias`
+5. Last name: `Gimenez`
 6. Email verified: ON
 7. Click "Create"
 8. Ve a la pestaña "Credentials"
@@ -245,7 +245,7 @@ curl -X POST http://localhost:9090/realms/logistica-realm/protocol/openid-connec
 
 **Usando Postman:**
 1. Crea una nueva request POST
-2. URL: `http://localhost:9090/realms/logistica-realm/protocol/openid-connect/token`
+2. URL: `http://localhost:8180/realms/logistica-realm/protocol/openid-connect/token`
 3. Body → x-www-form-urlencoded:
    - `client_id`: `logistica-api`
    - `client_secret`: (el que copiaste de Keycloak)
@@ -274,6 +274,9 @@ curl -X POST http://localhost:9090/realms/logistica-realm/protocol/openid-connec
 curl -X GET http://localhost:8080/api/clientes \
   -H "Authorization: Bearer TU_TOKEN_AQUI"
 \`\`\`
+
+curl -X GET http://localhost:8080/api/clientes \
+  -H "Authorization: 
 
 **Postman:**
 - Method: GET
