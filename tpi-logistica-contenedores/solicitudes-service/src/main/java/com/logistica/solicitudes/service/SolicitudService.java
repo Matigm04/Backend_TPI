@@ -129,6 +129,41 @@ public class SolicitudService {
         return mapToResponseDTO(solicitudActualizada);
     }
 
+    @Transactional
+    public SolicitudResponseDTO actualizarCostosYTiempos(Long id, ActualizarCostosDTO actualizacion) {
+        Solicitud solicitud = solicitudRepository.findById(id)
+            .orElseThrow(() -> new SolicitudNotFoundException("Solicitud no encontrada con ID: " + id));
+
+        log.info("Actualizando costos y tiempos de solicitud {}", solicitud.getNumero());
+
+        // Actualizar campos si no son null
+        if (actualizacion.getCostoEstimado() != null) {
+            solicitud.setCostoEstimado(actualizacion.getCostoEstimado());
+        }
+        if (actualizacion.getTiempoEstimadoHoras() != null) {
+            solicitud.setTiempoEstimadoHoras(actualizacion.getTiempoEstimadoHoras());
+        }
+        if (actualizacion.getCostoFinal() != null) {
+            solicitud.setCostoFinal(actualizacion.getCostoFinal());
+        }
+        if (actualizacion.getTiempoRealHoras() != null) {
+            solicitud.setTiempoRealHoras(actualizacion.getTiempoRealHoras());
+        }
+        if (actualizacion.getRutaId() != null) {
+            solicitud.setRutaId(actualizacion.getRutaId());
+        }
+
+        Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
+        log.info("Solicitud {} actualizada: costoEstimado={}, tiempoEstimado={}, costoFinal={}, tiempoReal={}", 
+            solicitud.getNumero(), 
+            solicitud.getCostoEstimado(), 
+            solicitud.getTiempoEstimadoHoras(),
+            solicitud.getCostoFinal(),
+            solicitud.getTiempoRealHoras());
+
+        return mapToResponseDTO(solicitudActualizada);
+    }
+
     @Transactional(readOnly = true)
     public SeguimientoDTO obtenerSeguimiento(String numero) {
         Solicitud solicitud = solicitudRepository.findByNumero(numero)

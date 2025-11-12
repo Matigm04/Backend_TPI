@@ -1,5 +1,6 @@
 package com.logistica.rutas.service;
 
+import com.logistica.rutas.dto.ActualizarCostosDTO;
 import com.logistica.rutas.dto.AsignarCamionDTO;
 import com.logistica.rutas.dto.ContenedorDTO;
 import com.logistica.rutas.dto.RutaRequestDTO;
@@ -93,10 +94,14 @@ public class RutaService {
         ruta.setCantidadTramos(tramos.size());
         ruta.setDistanciaTotalKm(distanciaTotal);
         ruta.setCostoEstimado(costoTotal);
-        ruta.setTiempoEstimadoHoras(calcularTiempoEstimado(distanciaTotal));
+        Integer tiempoEstimado = calcularTiempoEstimado(distanciaTotal);
+        ruta.setTiempoEstimadoHoras(tiempoEstimado);
 
         Ruta rutaGuardada = rutaRepository.save(ruta);
         log.info("Ruta tentativa calculada exitosamente con ID: {}", rutaGuardada.getId());
+
+        // Actualizar la solicitud con los costos y tiempos estimados
+        actualizarSolicitudConCostos(request.getSolicitudId(), costoTotal, tiempoEstimado, null, null, rutaGuardada.getId());
 
         return mapToResponseDTO(rutaGuardada);
     }
@@ -157,6 +162,21 @@ public class RutaService {
 
         Tramo tramoActualizado = tramoRepository.save(tramo);
         log.info("Tramo finalizado exitosamente");
+
+        // Calcular tiempo real en horas
+        Integer tiempoRealHoras = null;
+        if (tramo.getFechaHoraInicio() != null && tramo.getFechaHoraFin() != null) {
+            long minutos = java.time.Duration.between(tramo.getFechaHoraInicio(), tramo.getFechaHoraFin()).toMinutes();
+            tiempoRealHoras = (int) Math.ceil(minutos / 60.0);
+        }
+
+        // Obtener la ruta para actualizar costos finales
+        Ruta ruta = tramoActualizado.getRuta();
+        if (ruta != null) {
+            // Actualizar la solicitud con costos finales y tiempo real
+            actualizarSolicitudConCostos(ruta.getSolicitudId(), null, null, 
+                                         tramo.getCostoReal(), tiempoRealHoras, null);
+        }
 
         return mapTramoToResponseDTO(tramoActualizado);
     }
@@ -279,5 +299,33 @@ public class RutaService {
             .fechaHoraFin(tramo.getFechaHoraFin())
             .camionId(tramo.getCamionId())
             .build();
+    }
+
+    private void actualizarSolicitudConCostos(Long solicitudId, BigDecimal costoEstimado, 
+                                               Integer tiempoEstimadoHoras, BigDecimal costoFinal, 
+                                               Integer tiempoRealHoras, Long rutaId) {
+        try {
+            String url = solicitudesServiceUrl + "/api/solicitudes/" + solicitudId + "/costos-tiempos";
+            
+            ActualizarCostosDTO actualizacion = ActualizarCostosDTO.builder()
+                .costoEstimado(costoEstimado)
+                .tiempoEstimadoHoras(tiempoEstimadoHoras)
+                .costoFinal(costoFinal)
+                .tiempoRealHoras(tiempoRealHoras)
+                .rutaId(rutaId)
+                .build();
+            
+            // Usar exchange() en lugar de patchForObject() porque RestTemplate no soporta PATCH por defecto
+            org.springframework.http.HttpEntity<ActualizarCostosDTO> request = 
+                new org.springframework.http.HttpEntity<>(actualizacion);
+            
+            restTemplate.exchange(url, org.springframework.http.HttpMethod.PATCH, request, Object.class);
+            
+            log.info("Solicitud {} actualizada con costos: estimado={}, final={}, tiempoEstimado={}, tiempoReal={}", 
+                     solicitudId, costoEstimado, costoFinal, tiempoEstimadoHoras, tiempoRealHoras);
+        } catch (Exception e) {
+            log.error("Error al actualizar costos de solicitud {}: {}", solicitudId, e.getMessage());
+            // No lanzamos excepción para no afectar el flujo principal
+        }
     }
 }

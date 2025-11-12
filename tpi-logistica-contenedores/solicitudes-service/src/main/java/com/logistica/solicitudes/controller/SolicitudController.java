@@ -1,5 +1,6 @@
 package com.logistica.solicitudes.controller;
 
+import com.logistica.solicitudes.dto.ActualizarCostosDTO;
 import com.logistica.solicitudes.dto.SeguimientoDTO;
 import com.logistica.solicitudes.dto.SolicitudRequestDTO;
 import com.logistica.solicitudes.dto.SolicitudResponseDTO;
@@ -71,6 +72,16 @@ public class SolicitudController {
             @PathVariable Long id,
             @RequestParam EstadoSolicitud estado) {
         SolicitudResponseDTO response = solicitudService.actualizarEstado(id, estado);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/costos-tiempos")
+    @Operation(summary = "Actualizar costos y tiempos de solicitud", 
+               description = "Endpoint interno para que rutas-service actualice los costos estimados/finales y tiempos")
+    public ResponseEntity<SolicitudResponseDTO> actualizarCostosYTiempos(
+            @PathVariable Long id,
+            @RequestBody ActualizarCostosDTO actualizacion) {
+        SolicitudResponseDTO response = solicitudService.actualizarCostosYTiempos(id, actualizacion);
         return ResponseEntity.ok(response);
     }
 

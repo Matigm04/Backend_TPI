@@ -398,12 +398,12 @@ curl -X GET http://localhost:8080/api/camiones/disponibles \
 \`\`\`json
 {
   "id": 1,
-  "numero": "SOL-2025-00001",
+  "numero": "SOL-2025-0001",
   "estado": "PENDIENTE",
   "clienteId": 1,
   "contenedor": {
     "id": 1,
-    "identificacion": "CONT-TEST-001",
+    "identificacion": "CONT-TEST-01",
     "peso": 5000,
     "volumen": 15,
     "direccionOrigen": "Juan de garay 1755, Córdoba",
@@ -584,12 +584,21 @@ curl -X GET http://localhost:8080/api/camiones/disponibles \
 {
   "id": 1,
   "numero": "SOL-2025-00001",
-  "estado": "COMPLETADA",
+  "estado": "BORRADOR",
+  "costoEstimado": 1031.00,
+  "tiempoEstimadoHoras": 1,
+  "costoFinal": 1031.00,
+  "tiempoRealHoras": 1,
+  "rutaId": 8,
   ...
 }
 \`\`\`
 
-**📝 Nota:** El estado de la solicitud debería haber cambiado a `COMPLETADA` automáticamente.
+**📝 Nota:** 
+- Los campos `costoEstimado` y `tiempoEstimadoHoras` se actualizaron cuando calculaste la ruta (Paso 2)
+- Los campos `costoFinal` y `tiempoRealHoras` se actualizaron cuando finalizaste el tramo (Paso 5)
+- El campo `rutaId` muestra la ruta asociada a esta solicitud
+- El sistema ahora mantiene sincronizados los datos entre la ruta y la solicitud automáticamente
 
 ---
 
