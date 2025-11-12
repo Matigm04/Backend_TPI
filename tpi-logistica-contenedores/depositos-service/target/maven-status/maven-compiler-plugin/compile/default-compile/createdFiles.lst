@@ -1,0 +1,12 @@
+com\logistica\depositos\DepositosServiceApplication.class
+com\logistica\depositos\exception\DepositoNotFoundException.class
+com\logistica\depositos\dto\DepositoRequestDTO.class
+com\logistica\depositos\config\OpenApiConfig.class
+com\logistica\depositos\model\Deposito.class
+com\logistica\depositos\repository\DepositoRepository.class
+com\logistica\depositos\service\DepositoService.class
+com\logistica\depositos\controller\DepositoController.class
+com\logistica\depositos\exception\ErrorResponse.class
+com\logistica\depositos\exception\GlobalExceptionHandler.class
+com\logistica\depositos\dto\DepositoCercanoDTO.class
+com\logistica\depositos\dto\DepositoResponseDTO.class

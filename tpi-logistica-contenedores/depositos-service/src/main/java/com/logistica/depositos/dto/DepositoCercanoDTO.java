@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -30,6 +31,21 @@ public class DepositoCercanoDTO {
 
     @Schema(description = "Costo diario de estadía", example = "5000.00")
     private BigDecimal costoDiarioEstadia;
+
+    @Schema(description = "Capacidad máxima de contenedores", example = "50")
+    private Integer capacidadMaxima;
+
+    @Schema(description = "Cantidad actual de contenedores", example = "10")
+    private Integer contenedoresActuales;
+
+    @Schema(description = "Hora de apertura del depósito", example = "08:00:00")
+    private LocalTime horarioApertura;
+
+    @Schema(description = "Hora de cierre del depósito", example = "18:00:00")
+    private LocalTime horarioCierre;
+
+    @Schema(description = "Observaciones adicionales", example = "Requiere cita previa")
+    private String observaciones;
 
     @Schema(description = "Distancia aproximada en kilómetros", example = "12.5")
     private Double distanciaKm;

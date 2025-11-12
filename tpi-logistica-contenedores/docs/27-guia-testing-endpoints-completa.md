@@ -198,9 +198,15 @@ Authorization: Bearer <token-operador>
     "direccion": "Av. Circunvalación Km 5, Córdoba",
     "latitud": -31.3937,
     "longitud": -64.2324,
+    "costoDiarioEstadia": 5000.00,
     "capacidadMaxima": 100,
-    "espacioDisponible": 75,
-    "activo": true
+    "contenedoresActuales": 25,
+    "horarioApertura": "08:00:00",
+    "horarioCierre": "18:00:00",
+    "observaciones": "Requiere cita previa para descarga",
+    "activo": true,
+    "fechaCreacion": "2025-01-01T10:00:00",
+    "fechaActualizacion": "2025-01-15T14:30:00"
   }
 ]
 ```
@@ -237,8 +243,12 @@ Authorization: Bearer <token-operador>
     "direccion": "Av. Circunvalación Km 5, Córdoba",
     "latitud": -31.3937,
     "longitud": -64.2324,
+    "costoDiarioEstadia": 5000.00,
     "capacidadMaxima": 100,
-    "espacioDisponible": 75,
+    "contenedoresActuales": 25,
+    "horarioApertura": "08:00:00",
+    "horarioCierre": "18:00:00",
+    "observaciones": "Requiere cita previa para descarga",
     "distanciaKm": 3.45,
     "activo": true
   }
@@ -259,7 +269,11 @@ Content-Type: application/json
   "latitud": -31.350000,
   "longitud": -64.200000,
   "costoDiarioEstadia": 3000.00,
-  "capacidadMaxima": 80
+  "capacidadMaxima": 80,
+  "contenedoresActuales": 0,
+  "horarioApertura": "07:00:00",
+  "horarioCierre": "19:00:00",
+  "observaciones": "Acceso por Ruta 9, portón principal"
 }
 ```
 
@@ -272,6 +286,10 @@ Content-Type: application/json
 - `longitud`: Obligatoria, entre -180 y 180
 - `costoDiarioEstadia`: Obligatorio, mayor a 0
 - `capacidadMaxima`: Opcional, mínimo 1 si se provee
+- `contenedoresActuales`: Opcional, mínimo 0, por defecto 0
+- `horarioApertura`: Opcional, formato TIME (HH:MM:SS)
+- `horarioCierre`: Opcional, formato TIME (HH:MM:SS)
+- `observaciones`: Opcional, máximo 1000 caracteres
 
 ### 5. Actualizar Depósito
 **Rol requerido:** OPERADOR
@@ -287,7 +305,11 @@ Content-Type: application/json
   "latitud": -31.3937,
   "longitud": -64.2324,
   "costoDiarioEstadia": 5500.00,
-  "capacidadMaxima": 120
+  "capacidadMaxima": 120,
+  "contenedoresActuales": 30,
+  "horarioApertura": "06:00:00",
+  "horarioCierre": "20:00:00",
+  "observaciones": "Horario extendido - Cita previa obligatoria"
 }
 ```
 
@@ -1751,6 +1773,10 @@ Esta guía proporciona:
 | longitud | Double | ✅ | Entre -180 y 180 |
 | costoDiarioEstadia | BigDecimal | ✅ | Mayor a 0 |
 | capacidadMaxima | Integer | ❌ | Mínimo 1 si se provee |
+| contenedoresActuales | Integer | ❌ | Mínimo 0, por defecto 0 |
+| horarioApertura | LocalTime | ❌ | Formato: HH:MM:SS |
+| horarioCierre | LocalTime | ❌ | Formato: HH:MM:SS |
+| observaciones | String | ❌ | Max 1000 caracteres |
 
 ### Transportista
 

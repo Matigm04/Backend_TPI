@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -44,6 +45,20 @@ public class DepositoRequestDTO {
     @Min(value = 1, message = "La capacidad máxima debe ser al menos 1")
     @Schema(description = "Capacidad máxima de contenedores", example = "50")
     private Integer capacidadMaxima;
+
+    @Min(value = 0, message = "Los contenedores actuales no pueden ser negativos")
+    @Schema(description = "Cantidad actual de contenedores en el depósito", example = "10")
+    private Integer contenedoresActuales = 0;
+
+    @Schema(description = "Hora de apertura del depósito", example = "08:00:00")
+    private LocalTime horarioApertura;
+
+    @Schema(description = "Hora de cierre del depósito", example = "18:00:00")
+    private LocalTime horarioCierre;
+
+    @Size(max = 1000, message = "Las observaciones no pueden exceder 1000 caracteres")
+    @Schema(description = "Observaciones adicionales sobre el depósito", example = "Requiere cita previa para carga/descarga")
+    private String observaciones;
 
     @Schema(description = "Indica si el depósito está activo", example = "true")
     private Boolean activo = true;

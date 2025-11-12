@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -36,6 +37,18 @@ public class DepositoResponseDTO {
     @Schema(description = "Capacidad máxima de contenedores", example = "50")
     private Integer capacidadMaxima;
 
+    @Schema(description = "Cantidad actual de contenedores", example = "10")
+    private Integer contenedoresActuales;
+
+    @Schema(description = "Hora de apertura del depósito", example = "08:00:00")
+    private LocalTime horarioApertura;
+
+    @Schema(description = "Hora de cierre del depósito", example = "18:00:00")
+    private LocalTime horarioCierre;
+
+    @Schema(description = "Observaciones adicionales", example = "Requiere cita previa")
+    private String observaciones;
+
     @Schema(description = "Indica si el depósito está activo", example = "true")
     private Boolean activo;
 
@@ -54,6 +67,10 @@ public class DepositoResponseDTO {
         dto.setLongitud(deposito.getLongitud());
         dto.setCostoDiarioEstadia(deposito.getCostoDiarioEstadia());
         dto.setCapacidadMaxima(deposito.getCapacidadMaxima());
+        dto.setContenedoresActuales(deposito.getContenedoresActuales());
+        dto.setHorarioApertura(deposito.getHorarioApertura());
+        dto.setHorarioCierre(deposito.getHorarioCierre());
+        dto.setObservaciones(deposito.getObservaciones());
         dto.setActivo(deposito.getActivo());
         dto.setFechaCreacion(deposito.getFechaCreacion());
         dto.setFechaActualizacion(deposito.getFechaActualizacion());

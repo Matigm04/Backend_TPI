@@ -32,6 +32,10 @@ public class DepositoService {
         deposito.setLongitud(requestDTO.getLongitud());
         deposito.setCostoDiarioEstadia(requestDTO.getCostoDiarioEstadia());
         deposito.setCapacidadMaxima(requestDTO.getCapacidadMaxima());
+        deposito.setContenedoresActuales(requestDTO.getContenedoresActuales() != null ? requestDTO.getContenedoresActuales() : 0);
+        deposito.setHorarioApertura(requestDTO.getHorarioApertura());
+        deposito.setHorarioCierre(requestDTO.getHorarioCierre());
+        deposito.setObservaciones(requestDTO.getObservaciones());
         deposito.setActivo(requestDTO.getActivo() != null ? requestDTO.getActivo() : true);
 
         Deposito depositoGuardado = depositoRepository.save(deposito);
@@ -77,6 +81,10 @@ public class DepositoService {
         deposito.setLongitud(requestDTO.getLongitud());
         deposito.setCostoDiarioEstadia(requestDTO.getCostoDiarioEstadia());
         deposito.setCapacidadMaxima(requestDTO.getCapacidadMaxima());
+        deposito.setContenedoresActuales(requestDTO.getContenedoresActuales());
+        deposito.setHorarioApertura(requestDTO.getHorarioApertura());
+        deposito.setHorarioCierre(requestDTO.getHorarioCierre());
+        deposito.setObservaciones(requestDTO.getObservaciones());
         deposito.setActivo(requestDTO.getActivo());
 
         Deposito depositoActualizado = depositoRepository.save(deposito);
@@ -113,6 +121,11 @@ public class DepositoService {
                     dto.setLatitud(deposito.getLatitud());
                     dto.setLongitud(deposito.getLongitud());
                     dto.setCostoDiarioEstadia(deposito.getCostoDiarioEstadia());
+                    dto.setCapacidadMaxima(deposito.getCapacidadMaxima());
+                    dto.setContenedoresActuales(deposito.getContenedoresActuales());
+                    dto.setHorarioApertura(deposito.getHorarioApertura());
+                    dto.setHorarioCierre(deposito.getHorarioCierre());
+                    dto.setObservaciones(deposito.getObservaciones());
                     dto.setDistanciaKm(calcularDistancia(latitud, longitud, deposito.getLatitud(), deposito.getLongitud()));
                     return dto;
                 })

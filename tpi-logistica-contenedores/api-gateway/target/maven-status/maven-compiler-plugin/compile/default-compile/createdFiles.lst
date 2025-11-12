@@ -1,0 +1,4 @@
+com\logistica\gateway\config\GatewayConfig.class
+com\logistica\gateway\controller\FallbackController.class
+com\logistica\gateway\filter\LoggingGlobalFilter.class
+com\logistica\gateway\ApiGatewayApplication.class

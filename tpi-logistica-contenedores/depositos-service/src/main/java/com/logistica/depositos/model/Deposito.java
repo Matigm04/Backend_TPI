@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "depositos", indexes = {
@@ -41,6 +42,18 @@ public class Deposito {
 
     @Column(name = "capacidad_maxima")
     private Integer capacidadMaxima;
+
+    @Column(name = "contenedores_actuales", nullable = false)
+    private Integer contenedoresActuales = 0;
+
+    @Column(name = "horario_apertura")
+    private LocalTime horarioApertura;
+
+    @Column(name = "horario_cierre")
+    private LocalTime horarioCierre;
+
+    @Column(columnDefinition = "TEXT")
+    private String observaciones;
 
     @Column(nullable = false)
     private Boolean activo = true;

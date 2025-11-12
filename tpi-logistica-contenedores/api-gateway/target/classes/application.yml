@@ -44,7 +44,7 @@ spring:
         - id: camiones-service
           uri: ${CAMIONES_SERVICE_URL:http://localhost:8083}
           predicates:
-            - Path=/api/camiones/**
+            - Path=/api/camiones/**,/api/transportistas/**
           filters:
             - name: CircuitBreaker
               args:
