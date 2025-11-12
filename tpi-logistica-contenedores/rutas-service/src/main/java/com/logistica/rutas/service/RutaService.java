@@ -190,9 +190,26 @@ public class RutaService {
 
     @Transactional(readOnly = true)
     public List<RutaResponseDTO> listarTodas() {
-        return rutaRepository.findAll().stream()
+        return rutaRepository.findByActivaTrue().stream()
             .map(this::mapToResponseDTO)
             .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public RutaResponseDTO obtenerPorSolicitudId(Long solicitudId) {
+        List<Ruta> rutas = rutaRepository.findBySolicitudId(solicitudId);
+        
+        if (rutas.isEmpty()) {
+            throw new RutaNotFoundException("No se encontró ruta para la solicitud con ID: " + solicitudId);
+        }
+        
+        // Filtrar solo rutas activas y tomar la última creada
+        Ruta ruta = rutas.stream()
+            .filter(Ruta::getActiva)
+            .reduce((first, second) -> second) // Tomar la última
+            .orElseThrow(() -> new RutaNotFoundException("No se encontró ruta activa para la solicitud con ID: " + solicitudId));
+        
+        return mapToResponseDTO(ruta);
     }
 
     @Transactional(readOnly = true)
@@ -200,6 +217,24 @@ public class RutaService {
         return tramoRepository.findByCamionId(camionId).stream()
             .map(this::mapTramoToResponseDTO)
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void desactivarRuta(Long id) {
+        Ruta ruta = rutaRepository.findById(id)
+            .orElseThrow(() -> new RutaNotFoundException("Ruta no encontrada con ID: " + id));
+        
+        // Verificar que la ruta no tenga tramos en proceso
+        boolean tieneTramoEnProceso = ruta.getTramos().stream()
+            .anyMatch(tramo -> tramo.getEstado() == EstadoTramo.INICIADO);
+        
+        if (tieneTramoEnProceso) {
+            throw new IllegalStateException("No se puede desactivar una ruta con tramos en proceso");
+        }
+        
+        ruta.setActiva(false);
+        rutaRepository.save(ruta);
+        log.info("Ruta ID: {} desactivada exitosamente", id);
     }
 
     private SolicitudDTO obtenerSolicitud(Long solicitudId) {

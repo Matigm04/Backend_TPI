@@ -16,13 +16,21 @@ public class CamionRequestDTO {
     @Size(max = 20, message = "El dominio no puede exceder 20 caracteres")
     private String dominio;
     
-    @NotBlank(message = "El nombre del transportista es obligatorio")
-    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
-    private String nombreTransportista;
+    @NotBlank(message = "La marca es obligatoria")
+    @Size(max = 50, message = "La marca no puede exceder 50 caracteres")
+    private String marca;
     
-    @NotBlank(message = "El teléfono es obligatorio")
-    @Pattern(regexp = "^[+]?[0-9]{10,20}$", message = "Formato de teléfono inválido")
-    private String telefono;
+    @NotBlank(message = "El modelo es obligatorio")
+    @Size(max = 50, message = "El modelo no puede exceder 50 caracteres")
+    private String modelo;
+    
+    @NotNull(message = "El año es obligatorio")
+    @Min(value = 1900, message = "El año debe ser mayor o igual a 1900")
+    @Max(value = 2100, message = "El año debe ser menor o igual a 2100")
+    private Integer año;
+    
+    @NotNull(message = "El ID del transportista es obligatorio")
+    private Long transportistaId;
     
     @NotNull(message = "La capacidad de peso es obligatoria")
     @DecimalMin(value = "0.1", message = "La capacidad de peso debe ser mayor a 0")

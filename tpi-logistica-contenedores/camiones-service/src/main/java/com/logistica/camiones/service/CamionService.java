@@ -3,9 +3,11 @@ package com.logistica.camiones.service;
 import com.logistica.camiones.dto.CamionDisponibleDTO;
 import com.logistica.camiones.dto.CamionRequestDTO;
 import com.logistica.camiones.dto.CamionResponseDTO;
+import com.logistica.camiones.dto.TransportistaDTO;
 import com.logistica.camiones.exception.CamionNotFoundException;
 import com.logistica.camiones.exception.DominioYaExisteException;
 import com.logistica.camiones.model.Camion;
+import com.logistica.camiones.model.Transportista;
 import com.logistica.camiones.repository.CamionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class CamionService {
     
     private final CamionRepository camionRepository;
+    private final TransportistaService transportistaService;
     
     @Transactional
     public CamionResponseDTO crearCamion(CamionRequestDTO request) {
@@ -31,10 +34,15 @@ public class CamionService {
             throw new DominioYaExisteException("Ya existe un camión con el dominio: " + request.getDominio());
         }
         
+        // Obtener el transportista
+        Transportista transportista = transportistaService.obtenerEntidadPorId(request.getTransportistaId());
+        
         Camion camion = new Camion();
         camion.setDominio(request.getDominio());
-        camion.setNombreTransportista(request.getNombreTransportista());
-        camion.setTelefono(request.getTelefono());
+        camion.setMarca(request.getMarca());
+        camion.setModelo(request.getModelo());
+        camion.setAño(request.getAño());
+        camion.setTransportista(transportista);
         camion.setCapacidadPeso(request.getCapacidadPeso());
         camion.setCapacidadVolumen(request.getCapacidadVolumen());
         camion.setConsumoCombustible(request.getConsumoCombustible());
@@ -94,9 +102,14 @@ public class CamionService {
             }
         }
         
+        // Obtener el transportista
+        Transportista transportista = transportistaService.obtenerEntidadPorId(request.getTransportistaId());
+        
         camion.setDominio(request.getDominio());
-        camion.setNombreTransportista(request.getNombreTransportista());
-        camion.setTelefono(request.getTelefono());
+        camion.setMarca(request.getMarca());
+        camion.setModelo(request.getModelo());
+        camion.setAño(request.getAño());
+        camion.setTransportista(transportista);
         camion.setCapacidadPeso(request.getCapacidadPeso());
         camion.setCapacidadVolumen(request.getCapacidadVolumen());
         camion.setConsumoCombustible(request.getConsumoCombustible());
@@ -155,8 +168,19 @@ public class CamionService {
         CamionResponseDTO dto = new CamionResponseDTO();
         dto.setId(camion.getId());
         dto.setDominio(camion.getDominio());
-        dto.setNombreTransportista(camion.getNombreTransportista());
-        dto.setTelefono(camion.getTelefono());
+        dto.setMarca(camion.getMarca());
+        dto.setModelo(camion.getModelo());
+        dto.setAño(camion.getAño());
+        
+        // Mapear transportista
+        TransportistaDTO transportistaDTO = new TransportistaDTO();
+        transportistaDTO.setId(camion.getTransportista().getId());
+        transportistaDTO.setNombre(camion.getTransportista().getNombre());
+        transportistaDTO.setApellido(camion.getTransportista().getApellido());
+        transportistaDTO.setTelefono(camion.getTransportista().getTelefono());
+        transportistaDTO.setActivo(camion.getTransportista().getActivo());
+        dto.setTransportista(transportistaDTO);
+        
         dto.setCapacidadPeso(camion.getCapacidadPeso());
         dto.setCapacidadVolumen(camion.getCapacidadVolumen());
         dto.setConsumoCombustible(camion.getConsumoCombustible());
@@ -172,7 +196,7 @@ public class CamionService {
         CamionDisponibleDTO dto = new CamionDisponibleDTO();
         dto.setId(camion.getId());
         dto.setDominio(camion.getDominio());
-        dto.setNombreTransportista(camion.getNombreTransportista());
+        dto.setNombreTransportista(camion.getTransportista().getNombreCompleto());
         dto.setCapacidadPeso(camion.getCapacidadPeso());
         dto.setCapacidadVolumen(camion.getCapacidadVolumen());
         dto.setConsumoCombustible(camion.getConsumoCombustible());

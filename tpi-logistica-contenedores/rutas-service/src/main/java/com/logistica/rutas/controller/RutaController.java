@@ -31,18 +31,26 @@ public class RutaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Obtener ruta por ID")
-    public ResponseEntity<RutaResponseDTO> obtenerPorId(@PathVariable Long id) {
-        RutaResponseDTO response = rutaService.obtenerPorId(id);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping
     @Operation(summary = "Listar todas las rutas")
     public ResponseEntity<List<RutaResponseDTO>> listarTodas() {
         List<RutaResponseDTO> rutas = rutaService.listarTodas();
         return ResponseEntity.ok(rutas);
+    }
+
+    @GetMapping("/solicitud/{solicitudId}")
+    @Operation(summary = "Obtener ruta por ID de solicitud", 
+               description = "Busca la ruta activa asociada a una solicitud específica")
+    public ResponseEntity<RutaResponseDTO> obtenerPorSolicitudId(@PathVariable Long solicitudId) {
+        RutaResponseDTO response = rutaService.obtenerPorSolicitudId(solicitudId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener ruta por ID")
+    public ResponseEntity<RutaResponseDTO> obtenerPorId(@PathVariable Long id) {
+        RutaResponseDTO response = rutaService.obtenerPorId(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/tramos/{tramoId}/asignar-camion")
@@ -73,5 +81,13 @@ public class RutaController {
     public ResponseEntity<List<TramoResponseDTO>> listarTramosPorCamion(@PathVariable Long camionId) {
         List<TramoResponseDTO> tramos = rutaService.listarTramosPorCamion(camionId);
         return ResponseEntity.ok(tramos);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Desactivar ruta", 
+               description = "Desactiva una ruta (soft delete). No permite desactivar rutas con tramos en proceso.")
+    public ResponseEntity<Void> desactivarRuta(@PathVariable Long id) {
+        rutaService.desactivarRuta(id);
+        return ResponseEntity.noContent().build();
     }
 }

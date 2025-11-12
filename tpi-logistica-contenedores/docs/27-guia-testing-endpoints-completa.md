@@ -166,7 +166,7 @@ Content-Type: application/json
 **Respuesta esperada (200 OK):** Cliente actualizado
 
 ### 5. Desactivar Cliente
-**Rol requerido:** OPERADOR
+**Rol requerido:** Admin
 
 ```
 DELETE http://localhost:8080/api/clientes/5
@@ -219,14 +219,14 @@ Authorization: Bearer <token-operador>
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
-GET http://localhost:8080/api/depositos/cercanos?latitud=-31.403771&longitud=-64.163894&radio=20
+GET http://localhost:8080/api/depositos/cercanos?latitud=-31.403771&longitud=-64.163894&radioKm=20
 Authorization: Bearer <token-operador>
 ```
 
 **Parámetros:**
 - `latitud`: Latitud del punto de referencia (requerido)
 - `longitud`: Longitud del punto de referencia (requerido)
-- `radio`: Radio de búsqueda en km (requerido)
+- `radioKm`: Radio de búsqueda en km (requerido)
 
 **Respuesta esperada (200 OK):**
 ```json
@@ -309,7 +309,108 @@ Authorization: Bearer <token-operador>
 
 **Base URL:** `http://localhost:8080/api/camiones`
 
-### 1. Listar Todos los Camiones
+### 1. Listar Todos los Transportistas
+**Rol requerido:** OPERADOR, TRANSPORTISTA
+
+```
+GET http://localhost:8080/api/transportistas
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "nombre": "Carlos",
+    "apellido": "Rodríguez",
+    "telefono": "+541112345678",
+    "activo": true
+  }
+]
+```
+
+### 2. Obtener Transportista por ID
+**Rol requerido:** OPERADOR, TRANSPORTISTA
+
+```
+GET http://localhost:8080/api/transportistas/1
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (200 OK):** Objeto transportista
+
+### 3. Buscar Transportista por Nombre
+**Rol requerido:** OPERADOR, TRANSPORTISTA
+
+```
+GET http://localhost:8080/api/transportistas/buscar?nombre=Carlos
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (200 OK):** Lista de transportistas que coincidan con el nombre o apellido
+
+### 4. Crear Transportista
+**Rol requerido:** OPERADOR
+
+```
+POST http://localhost:8080/api/transportistas
+Authorization: Bearer <token-operador>
+Content-Type: application/json
+
+{
+  "nombre": "Jorge",
+  "apellido": "Martínez",
+  "telefono": "+541198765432"
+}
+```
+
+**Respuesta esperada (201 Created):**
+```json
+{
+  "id": 2,
+  "nombre": "Jorge",
+  "apellido": "Martínez",
+  "telefono": "+541198765432",
+  "activo": true
+}
+```
+
+**📝 Validaciones:**
+- `nombre`: Obligatorio, entre 2 y 100 caracteres
+- `apellido`: Obligatorio, entre 2 y 100 caracteres
+- `telefono`: Obligatorio, 10-20 dígitos, puede incluir +
+
+### 5. Actualizar Transportista
+**Rol requerido:** OPERADOR
+
+```
+PUT http://localhost:8080/api/transportistas/2
+Authorization: Bearer <token-operador>
+Content-Type: application/json
+
+{
+  "nombre": "Jorge Luis",
+  "apellido": "Martínez Pérez",
+  "telefono": "+541198765432"
+}
+```
+
+**Respuesta esperada (200 OK):** Transportista actualizado
+
+### 6. Desactivar Transportista
+**Rol requerido:** OPERADOR
+
+```
+DELETE http://localhost:8080/api/transportistas/2
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (204 No Content)**
+
+---
+
+### 7. Listar Todos los Camiones
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -323,8 +424,16 @@ Authorization: Bearer <token-operador>
   {
     "id": 1,
     "dominio": "AA123BB",
-    "nombreTransportista": "Carlos Rodríguez",
-    "telefono": "+541112345678",
+    "marca": "Mercedes-Benz",
+    "modelo": "Actros 2651",
+    "año": 2020,
+    "transportista": {
+      "id": 1,
+      "nombre": "Carlos",
+      "apellido": "Rodríguez",
+      "telefono": "+541112345678",
+      "activo": true
+    },
     "capacidadPeso": 15.00,
     "capacidadVolumen": 40.00,
     "consumoCombustible": 0.35,
@@ -335,7 +444,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 2. Obtener Camión por ID
+### 8. Obtener Camión por ID
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -345,7 +454,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto camión
 
-### 3. Listar Camiones Disponibles
+### 9. Listar Camiones Disponibles
 **Rol requerido:** OPERADOR
 
 ```
@@ -355,8 +464,10 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Lista de camiones con estado DISPONIBLE
 
-### 4. Crear Camión
+### 10. Crear Camión
 **Rol requerido:** OPERADOR
+
+**⚠️ REQUISITO PREVIO:** Debe existir un transportista creado. Primero crear transportista con POST /api/transportistas
 
 ```
 POST http://localhost:8080/api/camiones
@@ -365,8 +476,10 @@ Content-Type: application/json
 
 {
   "dominio": "ZZ999YY",
-  "nombreTransportista": "Jorge Martínez",
-  "telefono": "+541198765432",
+  "marca": "Scania",
+  "modelo": "R450",
+  "año": 2022,
+  "transportistaId": 2,
   "capacidadPeso": 18.00,
   "capacidadVolumen": 50.00,
   "consumoCombustible": 0.40,
@@ -379,8 +492,16 @@ Content-Type: application/json
 {
   "id": 5,
   "dominio": "ZZ999YY",
-  "nombreTransportista": "Jorge Martínez",
-  "telefono": "+541198765432",
+  "marca": "Scania",
+  "modelo": "R450",
+  "año": 2022,
+  "transportista": {
+    "id": 2,
+    "nombre": "Jorge",
+    "apellido": "Martínez",
+    "telefono": "+541198765432",
+    "activo": true
+  },
   "capacidadPeso": 18.00,
   "capacidadVolumen": 50.00,
   "consumoCombustible": 0.40,
@@ -392,14 +513,16 @@ Content-Type: application/json
 
 **📝 Validaciones:**
 - `dominio`: Obligatorio, máximo 20 caracteres
-- `nombreTransportista`: Obligatorio, máximo 100 caracteres
-- `telefono`: Obligatorio, 10-20 dígitos (puede incluir +)
+- `marca`: Obligatorio, máximo 50 caracteres
+- `modelo`: Obligatorio, máximo 50 caracteres
+- `año`: Obligatorio, entre 1900 y 2100
+- `transportistaId`: Obligatorio, debe existir un transportista con ese ID
 - `capacidadPeso`: Obligatorio, mayor a 0 (en toneladas)
 - `capacidadVolumen`: Obligatorio, mayor a 0 (en metros cúbicos)
 - `consumoCombustible`: Obligatorio, mayor a 0 (litros por km)
 - `costoPorKm`: Obligatorio, mayor a 0
 
-### 5. Actualizar Camión
+### 11. Actualizar Camión
 **Rol requerido:** OPERADOR
 
 ```
@@ -409,8 +532,10 @@ Content-Type: application/json
 
 {
   "dominio": "ZZ999YY",
-  "nombreTransportista": "Jorge Martínez Pérez",
-  "telefono": "+541198765432",
+  "marca": "Scania",
+  "modelo": "R500",
+  "año": 2023,
+  "transportistaId": 2,
   "capacidadPeso": 20.00,
   "capacidadVolumen": 55.00,
   "consumoCombustible": 0.38,
@@ -420,12 +545,7 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Camión actualizado
 
-### 6. Cambiar Estado del Camión
-**Rol requerido:** OPERADOR
-
-**⚠️ NOTA:** Este endpoint NO existe en el modelo actual. Los camiones solo tienen el campo `disponible` (boolean) que se gestiona automáticamente. Para cambiar la disponibilidad, actualiza el camión completo con PUT.
-
-### 7. Desactivar Camión
+### 12. Desactivar Camión
 **Rol requerido:** OPERADOR
 
 ```
@@ -550,7 +670,7 @@ Content-Type: application/json
 **Respuesta esperada (200 OK):** Tarifa actualizada
 
 ### 6. Desactivar Tarifa
-**Rol requerido:** OPERADOR
+**Rol requerido:** Admin
 
 ```
 DELETE http://localhost:8080/api/tarifas/3
@@ -675,43 +795,28 @@ Content-Type: application/json
 }
 ```
 
-### 5. Actualizar Solicitud
+### 5. Cancelar Solicitud
 **Rol requerido:** OPERADOR
 
+**⚠️ NOTA IMPORTANTE:** Las solicitudes NO se pueden actualizar una vez creadas. Si necesitas cambiar los datos del contenedor, debes:
+1. Crear una nueva solicitud con los datos correctos
+2. Cancelar la solicitud anterior usando el endpoint de cambio de estado
+
+Para cancelar una solicitud:
+
 ```
-PUT http://localhost:8080/api/solicitudes/6
+PATCH http://localhost:8080/api/solicitudes/6/estado?estado=CANCELADA
 Authorization: Bearer <token-operador>
-Content-Type: application/json
-
-{
-  "clienteId": 1,
-  "contenedor": {
-    "identificacion": "CONT-TEST-006-UPDATED",
-    "peso": 6000,
-    "volumen": 18,
-    "direccionOrigen": "Juan de Garay 1755, Córdoba",
-    "latitudOrigen": -31.403771,
-    "longitudOrigen": -64.163894,
-    "direccionDestino": "De los Toscanos 6581, Córdoba",
-    "latitudDestino": -31.340196,
-    "longitudDestino": -64.224319
-  }
-}
 ```
 
-**Respuesta esperada (200 OK):** Solicitud actualizada
+**Respuesta esperada (200 OK):** Solicitud con estado `CANCELADA`
 
 ### 6. Cambiar Estado de Solicitud
 **Rol requerido:** OPERADOR
 
 ```
-PATCH http://localhost:8080/api/solicitudes/6/estado
+PATCH http://localhost:8080/api/solicitudes/6/estado?estado=EN_PROCESO
 Authorization: Bearer <token-operador>
-Content-Type: application/json
-
-{
-  "estado": "CANCELADA"
-}
 ```
 
 **Estados válidos:** `PENDIENTE`, `EN_PROCESO`, `COMPLETADA`, `CANCELADA`
@@ -948,6 +1053,30 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (204 No Content)**
 
+**📝 Notas importantes:**
+- **Soft Delete:** La ruta NO se elimina de la base de datos, solo se marca como `activa=false`
+- **Validación:** No se puede desactivar una ruta que tenga tramos en estado `INICIADO`
+- **Filtrado automático:** Las rutas desactivadas NO aparecen en `GET /api/rutas` (solo muestra activas)
+- **Historial:** Los datos se preservan para auditoría y trazabilidad
+- **Caso de uso:** Útil para eliminar rutas tentativas que no se van a usar
+
+**Ejemplo de error al intentar desactivar ruta con tramo en proceso:**
+```json
+{
+  "status": 500,
+  "message": "No se puede desactivar una ruta con tramos en proceso",
+  "timestamp": "2025-11-12T21:30:00"
+}
+```
+
+**Verificación después de desactivar:**
+```
+GET http://localhost:8080/api/rutas
+Authorization: Bearer <token-operador>
+```
+
+La ruta desactivada ya NO aparecerá en la lista.
+
 ---
 
 ## Caso de Prueba Completo End-to-End
@@ -1019,7 +1148,7 @@ Authorization: Bearer TOKEN_OPERADOR
 ```json
 [
   {
-    "id": 1,
+    "id": 4,
     "nombre": "Juan",
     "apellido": "Pérez",
     "email": "juan.perez@email.com",
@@ -1028,7 +1157,7 @@ Authorization: Bearer TOKEN_OPERADOR
 ]
 ```
 
-**✅ Validación:** Cliente con `id: 1` existe y está activo.
+**✅ Validación:** Cliente con `id: 4` existe y está activo.
 
 #### 1.2 Verificar Camiones Disponibles
 
@@ -1572,6 +1701,7 @@ Authorization: Bearer TOKEN_OPERADOR
 | 403 Forbidden en /tramos/iniciar | Token de operador usado | Usar token de transportista |
 | 400 "Camión no disponible" | Camión ya asignado | Verificar estado con GET /camiones/{id} |
 | 404 "Tramo no encontrado" | ID de tramo incorrecto | Verificar ID en respuesta de calcular ruta |
+| 404 "Transportista no encontrado" | ID de transportista inválido | Crear transportista primero con POST /api/transportistas |
 | Solicitud sin `costoEstimado` | Error en sincronización | Verificar logs de rutas-service |
 | Solicitud sin `costoFinal` | Error en sincronización | Verificar logs al finalizar tramo |
 
@@ -1622,13 +1752,23 @@ Esta guía proporciona:
 | costoDiarioEstadia | BigDecimal | ✅ | Mayor a 0 |
 | capacidadMaxima | Integer | ❌ | Mínimo 1 si se provee |
 
+### Transportista
+
+| Campo | Tipo | Obligatorio | Validación |
+|-------|------|-------------|------------|
+| nombre | String | ✅ | 2-100 caracteres |
+| apellido | String | ✅ | 2-100 caracteres |
+| telefono | String | ✅ | 10-20 dígitos, puede incluir + |
+
 ### Camión
 
 | Campo | Tipo | Obligatorio | Validación |
 |-------|------|-------------|------------|
 | dominio | String | ✅ | Max 20 caracteres |
-| nombreTransportista | String | ✅ | Max 100 caracteres |
-| telefono | String | ✅ | 10-20 dígitos, puede incluir + |
+| marca | String | ✅ | Max 50 caracteres |
+| modelo | String | ✅ | Max 50 caracteres |
+| año | Integer | ✅ | Entre 1900 y 2100 |
+| transportistaId | Long | ✅ | ID válido de transportista existente |
 | capacidadPeso | BigDecimal | ✅ | Mayor a 0 (toneladas) |
 | capacidadVolumen | BigDecimal | ✅ | Mayor a 0 (m³) |
 | consumoCombustible | BigDecimal | ✅ | Mayor a 0 (litros/km) |

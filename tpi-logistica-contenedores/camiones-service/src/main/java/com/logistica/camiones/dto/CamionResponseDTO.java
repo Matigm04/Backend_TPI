@@ -14,8 +14,10 @@ public class CamionResponseDTO {
     
     private Long id;
     private String dominio;
-    private String nombreTransportista;
-    private String telefono;
+    private String marca;
+    private String modelo;
+    private Integer año;
+    private TransportistaDTO transportista;
     private BigDecimal capacidadPeso;
     private BigDecimal capacidadVolumen;
     private BigDecimal consumoCombustible;

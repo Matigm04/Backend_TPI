@@ -24,11 +24,18 @@ public class Camion {
     @Column(nullable = false, unique = true, length = 20)
     private String dominio; // Patente del camión
     
-    @Column(nullable = false, length = 100)
-    private String nombreTransportista;
+    @Column(nullable = false, length = 50)
+    private String marca;
     
-    @Column(nullable = false, length = 20)
-    private String telefono;
+    @Column(nullable = false, length = 50)
+    private String modelo;
+    
+    @Column(nullable = false)
+    private Integer año;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "transportista_id", nullable = false)
+    private Transportista transportista;
     
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal capacidadPeso; // En toneladas
