@@ -319,26 +319,31 @@ curl -X GET http://localhost:8080/api/camiones/disponibles \
 
 #### 5. Crear una Solicitud de Traslado
 
-\`\`\`bash
-curl -X POST http://localhost:8080/api/solicitudes \
-  -H "Authorization: Bearer TU_TOKEN_AQUI" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "clienteId": 1,
-    "contenedor": {
-      "codigoIdentificacion": "CONT-TEST-001",
-      "pesoKg": 5000,
-      "volumenM3": 15,
-      "largoM": 3,
-      "anchoM": 2.5,
-      "altoM": 2,
-      "descripcion": "Contenedor de prueba"
-    },
-    "ubicacionOrigen": "Av. Corrientes 1000, CABA",
-    "ubicacionDestino": "Av. Libertador 5000, Vicente López",
-    "observaciones": "Solicitud de prueba"
-  }'
+**Postman:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/solicitudes`
+- **Headers:**
+  - `Authorization`: `Bearer TU_TOKEN_AQUI`
+  - `Content-Type`: `application/json`
+- **Body (raw JSON):**
+\`\`\`json
+{
+  "clienteId": 1,
+  "contenedor": {
+    "identificacion": "CONT-TEST-001",
+    "peso": 5000,
+    "volumen": 15,
+    "direccionOrigen": "Av. Corrientes 1000, CABA",
+    "latitudOrigen": -34.6037,
+    "longitudOrigen": -58.3816,
+    "direccionDestino": "Av. Libertador 5000, Vicente López",
+    "latitudDestino": -34.5430,
+    "longitudDestino": -58.4632
+  }
+}
 \`\`\`
+
+**Nota:** Todos los campos del contenedor son obligatorios, incluyendo las coordenadas de origen y destino.
 
 ---
 
@@ -348,44 +353,256 @@ curl -X POST http://localhost:8080/api/solicitudes \
 
 **Objetivo:** Crear una solicitud, calcular ruta, asignar camión y completar el traslado.
 
-**Paso 1: Crear Solicitud**
-\`\`\`bash
-POST http://localhost:8080/api/solicitudes
-# (usar el JSON del ejemplo anterior)
+---
+
+#### **Paso 1: Crear Solicitud**
+
+**Postman:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/solicitudes`
+- **Headers:**
+  - `Authorization`: `Bearer <tu-token-operador>`
+  - `Content-Type`: `application/json`
+- **Body (raw JSON):**
+\`\`\`json
+{
+  "clienteId": 1,
+  "contenedor": {
+    "identificacion": "CONT-TEST-001",
+    "peso": 5000,
+    "volumen": 15,
+    "direccionOrigen": "Juan de garay 1755, Córdoba",
+    "latitudOrigen": -31.4173,
+    "longitudOrigen": -64.1834,
+    "direccionDestino": "De los toscanos 6581, Córdoba",
+    "latitudDestino": -31.3707,
+    "longitudDestino": -64.2478
+  }
+}
 \`\`\`
 
-**Paso 2: Calcular Rutas Tentativas**
-\`\`\`bash
-GET http://localhost:8080/api/rutas/solicitud/1/tentativas
+**⚠️ IMPORTANTE:** 
+- Todos los campos son **obligatorios**
+- `peso` y `volumen` deben ser números decimales mayores a 0
+- Las coordenadas deben estar en rangos válidos:
+  - Latitud: entre -90 y 90
+  - Longitud: entre -180 y 180
+- Para obtener coordenadas de una dirección, usá [Google Maps](https://maps.google.com) → click derecho en el mapa → "¿Qué hay aquí?"
+
+**Ejemplos de Coordenadas en Argentina:**
+- **Buenos Aires (Obelisco):** Lat: -34.6037, Long: -58.3816
+- **Córdoba (Centro):** Lat: -31.4173, Long: -64.1834
+- **Rosario (Monumento):** Lat: -32.9468, Long: -60.6393
+
+**Respuesta esperada (201 Created):**
+\`\`\`json
+{
+  "id": 1,
+  "numero": "SOL-2025-00001",
+  "estado": "PENDIENTE",
+  "clienteId": 1,
+  "contenedor": {
+    "id": 1,
+    "identificacion": "CONT-TEST-001",
+    "peso": 5000,
+    "volumen": 15,
+    "direccionOrigen": "Juan de garay 1755, Córdoba",
+    "latitudOrigen": -31.4173,
+    "longitudOrigen": -64.1834,
+    "direccionDestino": "De los toscanos 6581, Córdoba",
+    "latitudDestino": -31.3707,
+    "longitudDestino": -64.2478
+  },
+  "fechaCreacion": "2025-11-12T00:15:30.123456"
+}
 \`\`\`
 
-**Paso 3: Asignar Ruta**
-\`\`\`bash
-POST http://localhost:8080/api/rutas/solicitud/1/asignar
-Body: { "rutaId": 1 }
+**📝 Nota:** Guardá el `id` de la solicitud para los siguientes pasos.
+
+---
+
+#### **Paso 2: Calcular Ruta Tentativa**
+
+**Postman:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/rutas/calcular`
+- **Headers:**
+  - `Authorization`: `Bearer <tu-token-operador>`
+  - `Content-Type`: `application/json`
+- **Body (raw JSON):**
+\`\`\`json
+{
+  "solicitudId": 1
+}
 \`\`\`
 
-**Paso 4: Asignar Camión a Tramo**
-\`\`\`bash
-POST http://localhost:8080/api/rutas/tramos/1/asignar-camion
-Body: { "camionId": 1 }
+**Respuesta esperada (201 Created):**
+\`\`\`json
+{
+  "id": 1,
+  "solicitudId": 1,
+  "cantidadTramos": 1,
+  "cantidadDepositos": 0,
+  "distanciaTotalKm": 10.31,
+  "costoEstimado": 1031.0000,
+  "tiempoEstimadoHoras": 1,
+  "activa": true,
+  "tramos": [
+    {
+      "id": 1,
+      "orden": 1,
+      "origenTipo": "ORIGEN",
+      "origenDireccion": "Av. Corrientes 1000, CABA",
+      "destinoTipo": "DESTINO",
+      "destinoDireccion": "Av. Libertador 5000, Vicente López",
+      "tipoTramo": "ORIGEN_DESTINO",
+      "estado": "ESTIMADO",
+      "distanciaKm": 10.31,
+      "costoAproximado": 1031.0000,
+      "camionId": null
+    }
+  ],
+  "fechaCreacion": "2025-11-12T00:26:25.159099722"
+}
 \`\`\`
 
-**Paso 5: Iniciar Tramo (como Transportista)**
-\`\`\`bash
-POST http://localhost:8080/api/rutas/tramos/1/iniciar
-# Usar token de transportista1
+**📝 Nota:** Guardá el `tramos[0].id` (ID del tramo) para el siguiente paso.
+
+---
+
+#### **Paso 3: Asignar Camión al Tramo**
+
+**Postman:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/rutas/tramos/1/asignar-camion`
+  - ⚠️ **Reemplazá `1` con el ID del tramo del paso anterior**
+- **Headers:**
+  - `Authorization`: `Bearer <tu-token-operador>`
+  - `Content-Type`: `application/json`
+- **Body (raw JSON):**
+\`\`\`json
+{
+  "camionId": 1
+}
 \`\`\`
 
-**Paso 6: Finalizar Tramo**
-\`\`\`bash
-POST http://localhost:8080/api/rutas/tramos/1/finalizar
+**Respuesta esperada (200 OK):**
+\`\`\`json
+{
+  "id": 1,
+  "solicitudId": 1,
+  "tramos": [
+    {
+      "id": 1,
+      "estado": "ASIGNADO",
+      "camionId": 1,
+      ...
+    }
+  ]
+}
 \`\`\`
 
-**Paso 7: Consultar Estado de Solicitud**
-\`\`\`bash
-GET http://localhost:8080/api/solicitudes/1/seguimiento
+**📝 Nota:** El estado del tramo cambió de `ESTIMADO` a `ASIGNADO` y ahora tiene un `camionId`.
+
+---
+
+#### **Paso 4: Iniciar Tramo (como Transportista)**
+
+**⚠️ IMPORTANTE:** Debes obtener un token del usuario `transportista1` para este paso.
+
+**Postman - Obtener Token Transportista:**
+- **Method:** POST
+- **URL:** `http://localhost:8180/realms/logistica-realm/protocol/openid-connect/token`
+- **Headers:**
+  - `Content-Type`: `application/x-www-form-urlencoded`
+- **Body (x-www-form-urlencoded):**
+  - `client_id`: `logistica-api`
+  - `client_secret`: `<tu-client-secret>`
+  - `username`: `transportista1`
+  - `password`: `transportista123`
+  - `grant_type`: `password`
+
+**Postman - Iniciar Tramo:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/rutas/tramos/1/iniciar`
+  - ⚠️ **Reemplazá `1` con el ID del tramo**
+- **Headers:**
+  - `Authorization`: `Bearer <token-transportista>`
+
+**Respuesta esperada (200 OK):**
+\`\`\`json
+{
+  "id": 1,
+  "estado": "EN_CURSO",
+  "fechaHoraInicio": "2025-11-12T01:30:00",
+  "camionId": 1,
+  ...
+}
 \`\`\`
+
+**📝 Nota:** El estado cambió de `ASIGNADO` a `EN_CURSO` y se registró `fechaHoraInicio`.
+
+---
+
+#### **Paso 5: Finalizar Tramo**
+
+**Postman:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/rutas/tramos/1/finalizar`
+  - ⚠️ **Reemplazá `1` con el ID del tramo**
+- **Headers:**
+  - `Authorization`: `Bearer <token-transportista>`
+
+**Respuesta esperada (200 OK):**
+\`\`\`json
+{
+  "id": 1,
+  "estado": "COMPLETADO",
+  "fechaHoraInicio": "2025-11-12T01:30:00",
+  "fechaHoraFin": "2025-11-12T02:45:00",
+  "costoReal": 1031.0000,
+  "camionId": 1,
+  ...
+}
+\`\`\`
+
+**📝 Nota:** El estado cambió de `EN_CURSO` a `COMPLETADO` y se registró `fechaHoraFin`.
+
+---
+
+#### **Paso 6: Verificar Estado de la Solicitud**
+
+**Postman:**
+- **Method:** GET
+- **URL:** `http://localhost:8080/api/solicitudes/1`
+  - ⚠️ **Reemplazá `1` con el ID de tu solicitud**
+- **Headers:**
+  - `Authorization`: `Bearer <tu-token>`
+
+**Respuesta esperada (200 OK):**
+\`\`\`json
+{
+  "id": 1,
+  "numero": "SOL-2025-00001",
+  "estado": "COMPLETADA",
+  ...
+}
+\`\`\`
+
+**📝 Nota:** El estado de la solicitud debería haber cambiado a `COMPLETADA` automáticamente.
+
+---
+
+#### **📊 Resumen del Flujo:**
+
+| Paso | Endpoint | Estado Inicial | Estado Final | Usuario |
+|------|----------|----------------|--------------|---------|
+| 1 | POST /solicitudes | - | PENDIENTE | Operador |
+| 2 | POST /rutas/calcular | PENDIENTE | PENDIENTE (ruta creada) | Operador |
+| 3 | POST /tramos/{id}/asignar-camion | ESTIMADO | ASIGNADO | Operador |
+| 4 | POST /tramos/{id}/iniciar | ASIGNADO | EN_CURSO | Transportista |
+| 5 | POST /tramos/{id}/finalizar | EN_CURSO | COMPLETADO | Transportista |
+| 6 | GET /solicitudes/{id} | PENDIENTE | COMPLETADA | Cualquiera |
 
 ### Escenario 2: Búsqueda de Depósitos Cercanos
 

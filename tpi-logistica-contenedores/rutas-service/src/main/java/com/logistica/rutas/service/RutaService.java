@@ -1,8 +1,10 @@
 package com.logistica.rutas.service;
 
 import com.logistica.rutas.dto.AsignarCamionDTO;
+import com.logistica.rutas.dto.ContenedorDTO;
 import com.logistica.rutas.dto.RutaRequestDTO;
 import com.logistica.rutas.dto.RutaResponseDTO;
+import com.logistica.rutas.dto.SolicitudDTO;
 import com.logistica.rutas.dto.TramoResponseDTO;
 import com.logistica.rutas.exception.CamionNoDisponibleException;
 import com.logistica.rutas.exception.RutaNotFoundException;
@@ -47,17 +49,17 @@ public class RutaService {
         log.info("Calculando ruta tentativa para solicitud ID: {}", request.getSolicitudId());
 
         // Obtener datos de la solicitud
-        Object solicitud = obtenerSolicitud(request.getSolicitudId());
+        SolicitudDTO solicitud = obtenerSolicitud(request.getSolicitudId());
+        ContenedorDTO contenedor = solicitud.getContenedor();
         
-        // TODO: Extraer coordenadas de origen y destino de la solicitud
-        // Por ahora usamos valores de ejemplo
-        double latOrigen = -34.6037;
-        double lonOrigen = -58.3816;
-        String dirOrigen = "Buenos Aires, Argentina";
+        // Extraer coordenadas de origen y destino del contenedor
+        double latOrigen = contenedor.getLatitudOrigen();
+        double lonOrigen = contenedor.getLongitudOrigen();
+        String dirOrigen = contenedor.getDireccionOrigen();
         
-        double latDestino = -31.4201;
-        double lonDestino = -64.1888;
-        String dirDestino = "Córdoba, Argentina";
+        double latDestino = contenedor.getLatitudDestino();
+        double lonDestino = contenedor.getLongitudDestino();
+        String dirDestino = contenedor.getDireccionDestino();
 
         Ruta ruta = Ruta.builder()
             .solicitudId(request.getSolicitudId())
@@ -180,10 +182,18 @@ public class RutaService {
             .collect(Collectors.toList());
     }
 
-    private Object obtenerSolicitud(Long solicitudId) {
+    private SolicitudDTO obtenerSolicitud(Long solicitudId) {
         try {
             String url = solicitudesServiceUrl + "/api/solicitudes/" + solicitudId;
-            return restTemplate.getForObject(url, Object.class);
+            SolicitudDTO solicitud = restTemplate.getForObject(url, SolicitudDTO.class);
+            if (solicitud == null || solicitud.getContenedor() == null) {
+                throw new RuntimeException("Solicitud o contenedor no encontrado");
+            }
+            log.info("Solicitud obtenida: {} - Origen: {} - Destino: {}", 
+                    solicitud.getNumero(), 
+                    solicitud.getContenedor().getDireccionOrigen(),
+                    solicitud.getContenedor().getDireccionDestino());
+            return solicitud;
         } catch (Exception e) {
             log.error("Error al obtener solicitud: {}", solicitudId, e);
             throw new RuntimeException("Solicitud no encontrada con ID: " + solicitudId);
