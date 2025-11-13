@@ -60,7 +60,7 @@ grant_type=password
 
 **Base URL:** `http://localhost:8080/api/clientes`
 
-### 1. Listar Todos los Clientes
+### 1. Listar Todos los Clientes  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -87,7 +87,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 2. Obtener Cliente por ID
+### 2. Obtener Cliente por ID  (Funciona)
 **Rol requerido:** OPERADOR, CLIENTE (solo su propio ID)
 
 ```
@@ -97,11 +97,11 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto cliente
 
-### 3. Crear Cliente
+### 3. Crear Cliente (FUnciona pero a la primera vez me da error pero si se crea)
 **Rol requerido:** OPERADOR
 
 ```
-POST http://localhost:8080/api/clientes
+POST http://localhost:8080/api/clientes  
 Authorization: Bearer <token-operador>
 Content-Type: application/json
 
@@ -142,7 +142,7 @@ Content-Type: application/json
 - `telefono`: 8-20 caracteres, puede incluir +, -, espacios, paréntesis
 - `direccion`, `ciudad`, `provincia`, `codigoPostal`: Opcionales
 
-### 4. Actualizar Cliente
+### 4. Actualizar Cliente (Fuunciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -165,7 +165,7 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Cliente actualizado
 
-### 5. Desactivar Cliente
+### 5. Desactivar Cliente  (Funciona)
 **Rol requerido:** Admin
 
 ```
@@ -181,7 +181,7 @@ Authorization: Bearer <token-operador>
 
 **Base URL:** `http://localhost:8080/api/depositos`
 
-### 1. Listar Todos los Depósitos
+### 1. Listar Todos los Depósitos    (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -211,7 +211,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 2. Obtener Depósito por ID
+### 2. Obtener Depósito por ID   (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -221,7 +221,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto depósito
 
-### 3. Buscar Depósitos Cercanos
+### 3. Buscar Depósitos Cercanos     (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -255,7 +255,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 4. Crear Depósito
+### 4. Crear Depósito   (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -291,7 +291,7 @@ Content-Type: application/json
 - `horarioCierre`: Opcional, formato TIME (HH:MM:SS)
 - `observaciones`: Opcional, máximo 1000 caracteres
 
-### 5. Actualizar Depósito
+### 5. Actualizar Depósito  (Funciona sin token y con token)
 **Rol requerido:** OPERADOR
 
 ```
@@ -315,7 +315,7 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Depósito actualizado
 
-### 6. Desactivar Depósito
+### 6. Desactivar Depósito (Le damos un valor false en el activo) (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -331,7 +331,7 @@ Authorization: Bearer <token-operador>
 
 **Base URL:** `http://localhost:8080/api/camiones`
 
-### 1. Listar Todos los Transportistas
+### 1. Listar Todos los Transportistas (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -352,7 +352,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 2. Obtener Transportista por ID
+### 2. Obtener Transportista por ID (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -362,7 +362,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto transportista
 
-### 3. Buscar Transportista por Nombre
+### 3. Buscar Transportista por Nombre  (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -372,7 +372,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Lista de transportistas que coincidan con el nombre o apellido
 
-### 4. Crear Transportista
+### 4. Crear Transportista  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -403,7 +403,7 @@ Content-Type: application/json
 - `apellido`: Obligatorio, entre 2 y 100 caracteres
 - `telefono`: Obligatorio, 10-20 dígitos, puede incluir +
 
-### 5. Actualizar Transportista
+### 5. Actualizar Transportista  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -420,7 +420,7 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Transportista actualizado
 
-### 6. Desactivar Transportista
+### 6. Eliminar Transportista  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -432,7 +432,7 @@ Authorization: Bearer <token-operador>
 
 ---
 
-### 7. Listar Todos los Camiones
+### 7. Listar Todos los Camiones (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -466,7 +466,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 8. Obtener Camión por ID
+### 8. Obtener Camión por ID (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -476,7 +476,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto camión
 
-### 9. Listar Camiones Disponibles
+### 9. Listar Camiones Disponibles  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -486,7 +486,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Lista de camiones con estado DISPONIBLE
 
-### 10. Crear Camión
+### 10. Crear Camión  (Funciona)
 **Rol requerido:** OPERADOR
 
 **⚠️ REQUISITO PREVIO:** Debe existir un transportista creado. Primero crear transportista con POST /api/transportistas
@@ -544,7 +544,7 @@ Content-Type: application/json
 - `consumoCombustible`: Obligatorio, mayor a 0 (litros por km)
 - `costoPorKm`: Obligatorio, mayor a 0
 
-### 11. Actualizar Camión
+### 11. Actualizar Camión (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -567,7 +567,7 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Camión actualizado
 
-### 12. Desactivar Camión
+### 12. Desactivar Camión (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -583,7 +583,7 @@ Authorization: Bearer <token-operador>
 
 **Base URL:** `http://localhost:8080/api/tarifas`
 
-### 1. Listar Todas las Tarifas
+### 1. Listar Todas las Tarifas  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -600,6 +600,10 @@ Authorization: Bearer <token-operador>
     "descripcion": "Tarifa base por kilómetro recorrido",
     "valor": 100.00,
     "unidad": "$/km",
+    "rangoPesoMinKg": 0.00,
+    "rangoPesoMaxKg": 5000.00,
+    "rangoVolumenMinM3": 0.00,
+    "rangoVolumenMaxM3": 20.00,
     "vigenciaDesde": "2025-01-01",
     "vigenciaHasta": null,
     "activo": true
@@ -607,7 +611,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 2. Obtener Tarifa por ID
+### 2. Obtener Tarifa por ID (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -617,7 +621,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto tarifa
 
-### 3. Obtener Tarifas Vigentes
+### 3. Obtener Tarifas Vigentes  (Funciona)
 **Rol requerido:** OPERADOR, CLIENTE
 
 ```
@@ -627,7 +631,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Lista de tarifas activas sin fecha de fin
 
-### 4. Crear Tarifa
+### 4. Crear Tarifa  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -640,6 +644,10 @@ Content-Type: application/json
   "descripcion": "Precio del combustible por litro",
   "valor": 850.00,
   "unidad": "$/litro",
+  "rangoPesoMinKg": null,
+  "rangoPesoMaxKg": null,
+  "rangoVolumenMinM3": null,
+  "rangoVolumenMaxM3": null,
   "vigenciaDesde": "2025-02-01"
 }
 ```
@@ -652,6 +660,10 @@ Content-Type: application/json
   "descripcion": "Precio del combustible por litro",
   "valor": 850.00,
   "unidad": "$/litro",
+  "rangoPesoMinKg": null,
+  "rangoPesoMaxKg": null,
+  "rangoVolumenMinM3": null,
+  "rangoVolumenMaxM3": null,
   "vigenciaDesde": "2025-02-01",
   "vigenciaHasta": null,
   "activo": true
@@ -669,10 +681,14 @@ Content-Type: application/json
 - `descripcion`: Obligatoria, máximo 200 caracteres
 - `valor`: Obligatorio, mayor a 0
 - `unidad`: Opcional, máximo 20 caracteres
+- `rangoPesoMinKg`: Opcional, mínimo 0
+- `rangoPesoMaxKg`: Opcional, mínimo 0
+- `rangoVolumenMinM3`: Opcional, mínimo 0
+- `rangoVolumenMaxM3`: Opcional, mínimo 0
 - `vigenciaDesde`: Obligatoria (formato: YYYY-MM-DD)
 - `vigenciaHasta`: Opcional (formato: YYYY-MM-DD)
 
-### 5. Actualizar Tarifa
+### 5. Actualizar Tarifa (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -685,13 +701,17 @@ Content-Type: application/json
   "descripcion": "Precio del combustible por litro (actualizado)",
   "valor": 900.00,
   "unidad": "$/litro",
+  "rangoPesoMinKg": null,
+  "rangoPesoMaxKg": null,
+  "rangoVolumenMinM3": null,
+  "rangoVolumenMaxM3": null,
   "vigenciaDesde": "2025-02-01"
 }
 ```
 
 **Respuesta esperada (200 OK):** Tarifa actualizada
 
-### 6. Desactivar Tarifa
+### 6. Desactivar Tarifa (Funciona)
 **Rol requerido:** Admin
 
 ```
@@ -707,7 +727,7 @@ Authorization: Bearer <token-operador>
 
 **Base URL:** `http://localhost:8080/api/solicitudes`
 
-### 1. Listar Todas las Solicitudes
+### 1. Listar Todas las Solicitudes  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -745,7 +765,7 @@ Authorization: Bearer <token-operador>
 ]
 ```
 
-### 2. Obtener Solicitud por ID
+### 2. Obtener Solicitud por ID   (Funciona)
 **Rol requerido:** OPERADOR, CLIENTE (solo sus solicitudes)
 
 ```
@@ -755,7 +775,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto solicitud completo
 
-### 3. Listar Solicitudes por Cliente
+### 3. Listar Solicitudes por Cliente  (Funciona)
 **Rol requerido:** OPERADOR, CLIENTE (solo sus propias solicitudes)
 
 ```
@@ -765,7 +785,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Lista de solicitudes del cliente
 
-### 4. Crear Solicitud
+### 4. Crear Solicitud   (Funciona)
 **Rol requerido:** OPERADOR, CLIENTE
 
 ```
@@ -775,10 +795,21 @@ Content-Type: application/json
 
 {
   "clienteId": 1,
+  "ubicacionOrigen": "Juan de Garay 1755, Córdoba",
+  "ubicacionDestino": "De los Toscanos 6581, Córdoba",
+  "fechaProgramada": "2025-12-15",
+  "observaciones": "Carga frágil, manejar con cuidado",
+  "tarifaId": 1,
   "contenedor": {
     "identificacion": "CONT-TEST-006",
     "peso": 5000.00,
     "volumen": 15.00,
+    "largoM": 6.00,
+    "anchoM": 2.50,
+    "altoM": 2.60,
+    "estado": "DISPONIBLE",
+    "descripcion": "Contenedor refrigerado de 20 pies",
+    "clienteId": 1,
     "direccionOrigen": "Juan de Garay 1755, Córdoba",
     "latitudOrigen": -31.403771,
     "longitudOrigen": -64.163894,
@@ -794,13 +825,24 @@ Content-Type: application/json
 {
   "id": 6,
   "numero": "SOL-20251112153045",
-  "estado": "PENDIENTE",
+  "estado": "BORRADOR",
   "clienteId": 1,
+  "ubicacionOrigen": "Juan de Garay 1755, Córdoba",
+  "ubicacionDestino": "De los Toscanos 6581, Córdoba",
+  "fechaProgramada": "2025-12-15",
+  "observaciones": "Carga frágil, manejar con cuidado",
+  "tarifaId": 1,
   "contenedor": {
     "id": 6,
     "identificacion": "CONT-TEST-006",
     "peso": 5000.00,
     "volumen": 15.00,
+    "largoM": 6.00,
+    "anchoM": 2.50,
+    "altoM": 2.60,
+    "estado": "DISPONIBLE",
+    "descripcion": "Contenedor refrigerado de 20 pies",
+    "clienteId": 1,
     "direccionOrigen": "Juan de Garay 1755, Córdoba",
     "latitudOrigen": -31.403771,
     "longitudOrigen": -64.163894,
@@ -813,11 +855,13 @@ Content-Type: application/json
   "costoFinal": null,
   "tiempoRealHoras": null,
   "rutaId": null,
-  "fechaCreacion": "2025-11-12T15:30:45"
+  "activo": true,
+  "fechaCreacion": "2025-11-12T15:30:45",
+  "fechaActualizacion": "2025-11-12T15:30:45"
 }
 ```
 
-### 5. Cancelar Solicitud
+### 5. Cancelar Solicitud (Funciona)
 **Rol requerido:** OPERADOR
 
 **⚠️ NOTA IMPORTANTE:** Las solicitudes NO se pueden actualizar una vez creadas. Si necesitas cambiar los datos del contenedor, debes:
@@ -833,7 +877,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Solicitud con estado `CANCELADA`
 
-### 6. Cambiar Estado de Solicitud
+### 6. Cambiar Estado de Solicitud (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -866,11 +910,174 @@ Content-Type: application/json
 
 ---
 
+## Historial Estado Contenedor
+
+**Base URL:** `http://localhost:8080/api/historial-estados`
+
+### 1. Registrar Cambio de Estado
+**Rol requerido:** OPERADOR, TRANSPORTISTA
+
+```
+POST http://localhost:8080/api/historial-estados
+Authorization: Bearer <token-operador>
+Content-Type: application/json
+
+{
+  "contenedorId": 1,
+  "estadoAnterior": "DISPONIBLE",
+  "estadoNuevo": "EN_TRANSITO",
+  "ubicacion": "Juan de Garay 1755, Córdoba",
+  "tramoId": 1,
+  "observaciones": "Contenedor cargado y en camino",
+  "usuarioRegistro": "operador@logistica.com",
+  "depositoId": null
+}
+```
+
+**Respuesta esperada (201 Created):**
+```json
+{
+  "id": 1,
+  "contenedorId": 1,
+  "estadoAnterior": "DISPONIBLE",
+  "estadoNuevo": "EN_TRANSITO",
+  "ubicacion": "Juan de Garay 1755, Córdoba",
+  "tramoId": 1,
+  "fechaHora": "2025-11-13T10:30:00",
+  "observaciones": "Contenedor cargado y en camino",
+  "usuarioRegistro": "operador@logistica.com",
+  "depositoId": null
+}
+```
+
+**📝 Validaciones:**
+- `contenedorId`: Obligatorio, debe existir el contenedor
+- `estadoAnterior`: Opcional, máximo 30 caracteres
+- `estadoNuevo`: Obligatorio, máximo 30 caracteres
+- `ubicacion`: Opcional, máximo 500 caracteres
+- `tramoId`: Opcional, debe existir el tramo si se provee
+- `observaciones`: Opcional, máximo 1000 caracteres
+- `usuarioRegistro`: Opcional, máximo 100 caracteres
+- `depositoId`: Opcional, debe existir el depósito si se provee
+
+**Estados típicos de contenedor:**
+- `DISPONIBLE`: Contenedor disponible para asignar
+- `EN_TRANSITO`: En movimiento hacia destino
+- `EN_DEPOSITO`: Almacenado en depósito
+- `ENTREGADO`: Entregado al destino final
+- `EN_MANTENIMIENTO`: En proceso de mantenimiento
+- `FUERA_DE_SERVICIO`: No disponible para uso
+
+### 2. Listar Todo el Historial
+**Rol requerido:** OPERADOR
+
+```
+GET http://localhost:8080/api/historial-estados
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (200 OK):** Lista completa de cambios de estado
+
+### 3. Obtener Historial por Contenedor
+**Rol requerido:** OPERADOR, CLIENTE
+
+```
+GET http://localhost:8080/api/historial-estados/contenedor/1
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (200 OK):**
+```json
+[
+  {
+    "id": 3,
+    "contenedorId": 1,
+    "estadoAnterior": "EN_TRANSITO",
+    "estadoNuevo": "ENTREGADO",
+    "ubicacion": "De los Toscanos 6581, Córdoba",
+    "tramoId": 1,
+    "fechaHora": "2025-11-13T11:30:00",
+    "observaciones": "Entrega exitosa, cliente presente",
+    "usuarioRegistro": "transportista@logistica.com",
+    "depositoId": null
+  },
+  {
+    "id": 2,
+    "contenedorId": 1,
+    "estadoAnterior": "DISPONIBLE",
+    "estadoNuevo": "EN_TRANSITO",
+    "ubicacion": "Juan de Garay 1755, Córdoba",
+    "tramoId": 1,
+    "fechaHora": "2025-11-13T10:30:00",
+    "observaciones": "Contenedor cargado y en camino",
+    "usuarioRegistro": "operador@logistica.com",
+    "depositoId": null
+  }
+]
+```
+
+**📝 Nota:** Los resultados están ordenados por fecha descendente (más reciente primero)
+
+### 4. Obtener Historial por Tramo
+**Rol requerido:** OPERADOR, TRANSPORTISTA
+
+```
+GET http://localhost:8080/api/historial-estados/tramo/1
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (200 OK):** Lista de cambios de estado durante un tramo específico
+
+### 5. Obtener Historial por Depósito
+**Rol requerido:** OPERADOR
+
+```
+GET http://localhost:8080/api/historial-estados/deposito/1
+Authorization: Bearer <token-operador>
+```
+
+**Respuesta esperada (200 OK):**
+```json
+[
+  {
+    "id": 5,
+    "contenedorId": 2,
+    "estadoAnterior": "EN_TRANSITO",
+    "estadoNuevo": "EN_DEPOSITO",
+    "ubicacion": "Depósito Central Córdoba",
+    "tramoId": 3,
+    "fechaHora": "2025-11-13T14:00:00",
+    "observaciones": "Almacenamiento temporal por 2 días",
+    "usuarioRegistro": "operador@logistica.com",
+    "depositoId": 1
+  }
+]
+```
+
+**📝 Casos de Uso Típicos:**
+
+1. **Seguimiento de contenedor durante transporte:**
+   - Registrar estado `EN_TRANSITO` al iniciar tramo
+   - Registrar `EN_DEPOSITO` si hay parada intermedia
+   - Registrar `ENTREGADO` al completar
+
+2. **Auditoría de movimientos:**
+   - Consultar historial completo por contenedor
+   - Verificar cambios durante un tramo específico
+   - Revisar actividad en un depósito
+
+3. **Trazabilidad para clientes:**
+   - Cliente puede consultar historial de su contenedor
+   - Ver ubicación actual y estados previos
+   - Recibir observaciones sobre el estado
+
+---
+
 ## Rutas Service
 
 **Base URL:** `http://localhost:8080/api/rutas`
 
-### 1. Listar Todas las Rutas
+### 1. Listar Todas las Rutas  (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -888,26 +1095,38 @@ Authorization: Bearer <token-operador>
     "cantidadDepositos": 0,
     "distanciaTotalKm": 9.50,
     "costoEstimado": 950.00,
+    "costoTotalReal": null,
     "tiempoEstimadoHoras": 1,
+    "estado": "PLANIFICADA",
     "activa": true,
     "tramos": [
       {
         "id": 1,
         "orden": 1,
         "origenTipo": "ORIGEN",
+        "origenDireccion": "Juan de Garay 1755, Córdoba",
         "destinoTipo": "DESTINO",
+        "destinoDireccion": "De los Toscanos 6581, Córdoba",
+        "tipoTramo": "ORIGEN_DESTINO",
         "estado": "ESTIMADO",
         "distanciaKm": 9.50,
         "costoAproximado": 950.00,
+        "costoReal": null,
+        "fechaHoraInicioEstimada": "2025-12-15T08:00:00",
+        "fechaHoraFinEstimada": "2025-12-15T09:00:00",
+        "fechaHoraInicio": null,
+        "fechaHoraFin": null,
+        "observaciones": null,
         "camionId": null
       }
     ],
-    "fechaCreacion": "2025-11-12T10:35:00"
+    "fechaCreacion": "2025-11-12T10:35:00",
+    "fechaActualizacion": "2025-11-12T10:35:00"
   }
 ]
 ```
 
-### 2. Obtener Ruta por ID
+### 2. Obtener Ruta por ID (Funciona)
 **Rol requerido:** OPERADOR, TRANSPORTISTA
 
 ```
@@ -917,7 +1136,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Objeto ruta completo con tramos
 
-### 3. Obtener Ruta por Solicitud
+### 3. Obtener Ruta por Solicitud (Funciona)
 **Rol requerido:** OPERADOR, CLIENTE (solo sus solicitudes)
 
 ```
@@ -927,7 +1146,7 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Ruta asociada a la solicitud
 
-### 4. Calcular Ruta Tentativa
+### 4. Calcular Ruta Tentativa (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -995,20 +1214,31 @@ Content-Type: application/json
 **Respuesta esperada (200 OK):**
 ```json
 {
-  "id": 15,
-  "solicitudId": 6,
-  "tramos": [
-    {
-      "id": 30,
-      "estado": "ASIGNADO",
-      "camionId": 1,
-      ...
-    }
-  ]
+  "id": 30,
+  "orden": 1,
+  "origenTipo": "ORIGEN",
+  "origenDireccion": "Juan de Garay 1755, Córdoba",
+  "origenLatitud": -31.403771,
+  "origenLongitud": -64.163894,
+  "destinoTipo": "DESTINO",
+  "destinoDireccion": "De los Toscanos 6581, Córdoba",
+  "destinoLatitud": -31.340196,
+  "destinoLongitud": -64.224319,
+  "tipoTramo": "ORIGEN_DESTINO",
+  "estado": "ASIGNADO",
+  "distanciaKm": 9.10,
+  "costoAproximado": 910.00,
+  "costoReal": null,
+  "fechaHoraInicioEstimada": null,
+  "fechaHoraFinEstimada": null,
+  "fechaHoraInicio": null,
+  "fechaHoraFin": null,
+  "observaciones": null,
+  "camionId": 1
 }
 ```
 
-**📝 Nota:** El estado del tramo cambia de `ESTIMADO` a `ASIGNADO` y el camión queda reservado.
+**📝 Nota:** El estado del tramo cambia de `ESTIMADO` a `ASIGNADO` y el camión queda reservado. La respuesta devuelve solo el tramo actualizado para mantener consistencia con los endpoints de iniciar/finalizar tramo.
 
 ### 6. Iniciar Tramo
 **Rol requerido:** TRANSPORTISTA

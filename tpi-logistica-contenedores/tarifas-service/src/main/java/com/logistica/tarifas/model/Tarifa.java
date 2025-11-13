@@ -35,6 +35,18 @@ public class Tarifa {
     @Column(length = 20)
     private String unidad; // ej: "$/km", "$/litro", "$/día"
     
+    @Column(precision = 10, scale = 2)
+    private BigDecimal rangoPesoMinKg;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal rangoPesoMaxKg;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal rangoVolumenMinM3;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal rangoVolumenMaxM3;
+    
     @Column(nullable = false)
     private LocalDate vigenciaDesde;
     

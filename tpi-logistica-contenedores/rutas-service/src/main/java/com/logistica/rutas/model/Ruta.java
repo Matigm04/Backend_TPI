@@ -23,7 +23,7 @@ public class Ruta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "solicitud_id", nullable = false)
+    @Column(name = "solicitud_id", nullable = false, unique = true)
     private Long solicitudId;
 
     @Column(name = "cantidad_tramos", nullable = false)
@@ -38,8 +38,14 @@ public class Ruta {
     @Column(name = "costo_estimado", precision = 10, scale = 2)
     private BigDecimal costoEstimado;
 
+    @Column(name = "costo_total_real", precision = 10, scale = 2)
+    private BigDecimal costoTotalReal;
+
     @Column(name = "tiempo_estimado_horas")
     private Integer tiempoEstimadoHoras;
+
+    @Column(length = 30)
+    private String estado;
 
     @Column(nullable = false)
     private Boolean activa = true;

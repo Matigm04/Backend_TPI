@@ -19,6 +19,10 @@ public class TarifaResponseDTO {
     private String descripcion;
     private BigDecimal valor;
     private String unidad;
+    private BigDecimal rangoPesoMinKg;
+    private BigDecimal rangoPesoMaxKg;
+    private BigDecimal rangoVolumenMinM3;
+    private BigDecimal rangoVolumenMaxM3;
     private LocalDate vigenciaDesde;
     private LocalDate vigenciaHasta;
     private Boolean activo;

@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,11 +23,13 @@ import java.util.List;
 @RequestMapping("/api/depositos")
 @RequiredArgsConstructor
 @Tag(name = "Depósitos", description = "API para gestión de depósitos de contenedores")
+@SecurityRequirement(name = "bearer-jwt")
 public class DepositoController {
 
     private final DepositoService depositoService;
 
     @PostMapping
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Crear nuevo depósito", description = "Crea un nuevo depósito en el sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Depósito creado exitosamente"),
@@ -39,6 +43,7 @@ public class DepositoController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('OPERADOR', 'TRANSPORTISTA')")
     @Operation(summary = "Listar todos los depósitos", description = "Obtiene la lista completa de depósitos")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente"),
@@ -54,6 +59,7 @@ public class DepositoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'TRANSPORTISTA')")
     @Operation(summary = "Obtener depósito por ID", description = "Obtiene la información de un depósito específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Depósito encontrado"),
@@ -68,6 +74,7 @@ public class DepositoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Actualizar depósito", description = "Actualiza la información de un depósito existente")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Depósito actualizado exitosamente"),
@@ -84,6 +91,7 @@ public class DepositoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Eliminar depósito", description = "Desactiva un depósito (eliminación lógica)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Depósito eliminado exitosamente"),
@@ -98,6 +106,7 @@ public class DepositoController {
     }
 
     @GetMapping("/cercanos")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'TRANSPORTISTA')")
     @Operation(summary = "Buscar depósitos cercanos", 
                description = "Busca depósitos activos dentro de un radio específico desde una ubicación")
     @ApiResponses(value = {

@@ -31,6 +31,10 @@ public class TarifaService {
         tarifa.setDescripcion(request.getDescripcion());
         tarifa.setValor(request.getValor());
         tarifa.setUnidad(request.getUnidad());
+        tarifa.setRangoPesoMinKg(request.getRangoPesoMinKg());
+        tarifa.setRangoPesoMaxKg(request.getRangoPesoMaxKg());
+        tarifa.setRangoVolumenMinM3(request.getRangoVolumenMinM3());
+        tarifa.setRangoVolumenMaxM3(request.getRangoVolumenMaxM3());
         tarifa.setVigenciaDesde(request.getVigenciaDesde());
         tarifa.setVigenciaHasta(request.getVigenciaHasta());
         tarifa.setActivo(true);
@@ -95,6 +99,10 @@ public class TarifaService {
         tarifa.setDescripcion(request.getDescripcion());
         tarifa.setValor(request.getValor());
         tarifa.setUnidad(request.getUnidad());
+        tarifa.setRangoPesoMinKg(request.getRangoPesoMinKg());
+        tarifa.setRangoPesoMaxKg(request.getRangoPesoMaxKg());
+        tarifa.setRangoVolumenMinM3(request.getRangoVolumenMinM3());
+        tarifa.setRangoVolumenMaxM3(request.getRangoVolumenMaxM3());
         tarifa.setVigenciaDesde(request.getVigenciaDesde());
         tarifa.setVigenciaHasta(request.getVigenciaHasta());
         
@@ -124,6 +132,10 @@ public class TarifaService {
         dto.setDescripcion(tarifa.getDescripcion());
         dto.setValor(tarifa.getValor());
         dto.setUnidad(tarifa.getUnidad());
+        dto.setRangoPesoMinKg(tarifa.getRangoPesoMinKg());
+        dto.setRangoPesoMaxKg(tarifa.getRangoPesoMaxKg());
+        dto.setRangoVolumenMinM3(tarifa.getRangoVolumenMinM3());
+        dto.setRangoVolumenMaxM3(tarifa.getRangoVolumenMaxM3());
         dto.setVigenciaDesde(tarifa.getVigenciaDesde());
         dto.setVigenciaHasta(tarifa.getVigenciaHasta());
         dto.setActivo(tarifa.getActivo());

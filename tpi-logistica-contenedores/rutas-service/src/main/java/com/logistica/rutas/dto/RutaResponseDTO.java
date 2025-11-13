@@ -20,8 +20,11 @@ public class RutaResponseDTO {
     private Integer cantidadDepositos;
     private BigDecimal distanciaTotalKm;
     private BigDecimal costoEstimado;
+    private BigDecimal costoTotalReal;
     private Integer tiempoEstimadoHoras;
+    private String estado;
     private Boolean activa;
     private List<TramoResponseDTO> tramos;
     private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaActualizacion;
 }

@@ -107,7 +107,7 @@ public class RutaService {
     }
 
     @Transactional
-    public RutaResponseDTO asignarCamionATramo(Long tramoId, AsignarCamionDTO request) {
+    public TramoResponseDTO asignarCamionATramo(Long tramoId, AsignarCamionDTO request) {
         log.info("Asignando camión {} al tramo {}", request.getCamionId(), tramoId);
 
         Tramo tramo = tramoRepository.findById(tramoId)
@@ -119,10 +119,10 @@ public class RutaService {
         tramo.setCamionId(request.getCamionId());
         tramo.setEstado(EstadoTramo.ASIGNADO);
 
-        tramoRepository.save(tramo);
+        Tramo tramoActualizado = tramoRepository.save(tramo);
         log.info("Camión asignado exitosamente al tramo");
 
-        return mapToResponseDTO(tramo.getRuta());
+        return mapTramoToResponseDTO(tramoActualizado);
     }
 
     @Transactional
@@ -308,12 +308,15 @@ public class RutaService {
             .cantidadDepositos(ruta.getCantidadDepositos())
             .distanciaTotalKm(ruta.getDistanciaTotalKm())
             .costoEstimado(ruta.getCostoEstimado())
+            .costoTotalReal(ruta.getCostoTotalReal())
             .tiempoEstimadoHoras(ruta.getTiempoEstimadoHoras())
+            .estado(ruta.getEstado())
             .activa(ruta.getActiva())
             .tramos(ruta.getTramos().stream()
                 .map(this::mapTramoToResponseDTO)
                 .collect(Collectors.toList()))
             .fechaCreacion(ruta.getFechaCreacion())
+            .fechaActualizacion(ruta.getFechaActualizacion())
             .build();
     }
 
@@ -330,8 +333,11 @@ public class RutaService {
             .distanciaKm(tramo.getDistanciaKm())
             .costoAproximado(tramo.getCostoAproximado())
             .costoReal(tramo.getCostoReal())
+            .fechaHoraInicioEstimada(tramo.getFechaHoraInicioEstimada())
+            .fechaHoraFinEstimada(tramo.getFechaHoraFinEstimada())
             .fechaHoraInicio(tramo.getFechaHoraInicio())
             .fechaHoraFin(tramo.getFechaHoraFin())
+            .observaciones(tramo.getObservaciones())
             .camionId(tramo.getCamionId())
             .build();
     }

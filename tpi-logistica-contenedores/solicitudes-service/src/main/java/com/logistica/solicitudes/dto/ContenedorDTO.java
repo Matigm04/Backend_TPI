@@ -26,6 +26,23 @@ public class ContenedorDTO {
     @DecimalMin(value = "0.01", message = "El volumen debe ser mayor a 0")
     private BigDecimal volumen;
 
+    @DecimalMin(value = "0.01", message = "El largo debe ser mayor a 0")
+    private BigDecimal largoM;
+
+    @DecimalMin(value = "0.01", message = "El ancho debe ser mayor a 0")
+    private BigDecimal anchoM;
+
+    @DecimalMin(value = "0.01", message = "El alto debe ser mayor a 0")
+    private BigDecimal altoM;
+
+    @Size(max = 30, message = "El estado no puede exceder 30 caracteres")
+    private String estado;
+
+    @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres")
+    private String descripcion;
+
+    private Long clienteId;
+
     @NotBlank(message = "La dirección de origen es obligatoria")
     @Size(max = 500, message = "La dirección de origen no puede exceder 500 caracteres")
     private String direccionOrigen;

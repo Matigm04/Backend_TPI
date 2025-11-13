@@ -1,0 +1,13 @@
+com\logistica\tarifas\model\TipoTarifa.class
+com\logistica\tarifas\config\OpenApiConfig.class
+com\logistica\tarifas\controller\TarifaController.class
+com\logistica\tarifas\exception\GlobalExceptionHandler$ErrorResponse.class
+com\logistica\tarifas\repository\TarifaRepository.class
+com\logistica\tarifas\dto\TarifaRequestDTO.class
+com\logistica\tarifas\config\SecurityConfig.class
+com\logistica\tarifas\exception\GlobalExceptionHandler.class
+com\logistica\tarifas\exception\TarifaNotFoundException.class
+com\logistica\tarifas\TarifasServiceApplication.class
+com\logistica\tarifas\dto\TarifaResponseDTO.class
+com\logistica\tarifas\model\Tarifa.class
+com\logistica\tarifas\service\TarifaService.class

@@ -16,6 +16,12 @@ public class ContenedorResponseDTO {
     private String identificacion;
     private BigDecimal peso;
     private BigDecimal volumen;
+    private BigDecimal largoM;
+    private BigDecimal anchoM;
+    private BigDecimal altoM;
+    private String estado;
+    private String descripcion;
+    private Long clienteId;
     private String direccionOrigen;
     private Double latitudOrigen;
     private Double longitudOrigen;

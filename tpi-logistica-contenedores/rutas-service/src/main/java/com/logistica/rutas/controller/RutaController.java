@@ -55,10 +55,10 @@ public class RutaController {
 
     @PostMapping("/tramos/{tramoId}/asignar-camion")
     @Operation(summary = "Asignar camión a tramo")
-    public ResponseEntity<RutaResponseDTO> asignarCamionATramo(
+    public ResponseEntity<TramoResponseDTO> asignarCamionATramo(
             @PathVariable Long tramoId,
             @Valid @RequestBody AsignarCamionDTO request) {
-        RutaResponseDTO response = rutaService.asignarCamionATramo(tramoId, request);
+        TramoResponseDTO response = rutaService.asignarCamionATramo(tramoId, request);
         return ResponseEntity.ok(response);
     }
 

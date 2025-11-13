@@ -30,6 +30,24 @@ public class Contenedor {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal volumen; // en metros cúbicos
 
+    @Column(precision = 5, scale = 2)
+    private BigDecimal largoM;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal anchoM;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal altoM;
+
+    @Column(length = 30)
+    private String estado;
+
+    @Column(columnDefinition = "TEXT")
+    private String descripcion;
+
+    @Column(name = "cliente_id")
+    private Long clienteId;
+
     @Column(nullable = false, length = 500)
     private String direccionOrigen;
 

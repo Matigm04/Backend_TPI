@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,6 +32,12 @@ public class Solicitud {
     @JoinColumn(name = "contenedor_id", referencedColumnName = "id")
     private Contenedor contenedor;
 
+    @Column(name = "ubicacion_origen", nullable = false)
+    private String ubicacionOrigen;
+
+    @Column(name = "ubicacion_destino", nullable = false)
+    private String ubicacionDestino;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoSolicitud estado;
@@ -50,14 +57,26 @@ public class Solicitud {
     @Column(name = "ruta_id")
     private Long rutaId;
 
+    @Column(name = "tarifa_id")
+    private Long tarifaId;
+
     @Column(name = "fecha_solicitud", nullable = false)
     private LocalDateTime fechaSolicitud;
+
+    @Column(name = "fecha_programada")
+    private LocalDate fechaProgramada;
 
     @Column(name = "fecha_entrega_estimada")
     private LocalDateTime fechaEntregaEstimada;
 
     @Column(name = "fecha_entrega_real")
     private LocalDateTime fechaEntregaReal;
+
+    @Column(columnDefinition = "TEXT")
+    private String observaciones;
+
+    @Column(nullable = false)
+    private Boolean activo = true;
 
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;

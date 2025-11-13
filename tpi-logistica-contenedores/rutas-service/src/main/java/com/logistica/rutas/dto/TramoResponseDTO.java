@@ -27,7 +27,10 @@ public class TramoResponseDTO {
     private BigDecimal distanciaKm;
     private BigDecimal costoAproximado;
     private BigDecimal costoReal;
+    private LocalDateTime fechaHoraInicioEstimada;
+    private LocalDateTime fechaHoraFinEstimada;
     private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFin;
+    private String observaciones;
     private Long camionId;
 }

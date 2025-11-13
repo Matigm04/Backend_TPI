@@ -77,11 +77,20 @@ public class Tramo {
     @Column(name = "costo_real", precision = 10, scale = 2)
     private BigDecimal costoReal;
 
+    @Column(name = "fecha_hora_inicio_estimada")
+    private LocalDateTime fechaHoraInicioEstimada;
+
+    @Column(name = "fecha_hora_fin_estimada")
+    private LocalDateTime fechaHoraFinEstimada;
+
     @Column(name = "fecha_hora_inicio")
     private LocalDateTime fechaHoraInicio;
 
     @Column(name = "fecha_hora_fin")
     private LocalDateTime fechaHoraFin;
+
+    @Column(columnDefinition = "TEXT")
+    private String observaciones;
 
     @Column(name = "camion_id")
     private Long camionId;

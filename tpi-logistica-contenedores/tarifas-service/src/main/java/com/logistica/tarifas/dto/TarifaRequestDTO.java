@@ -28,6 +28,18 @@ public class TarifaRequestDTO {
     @Size(max = 20, message = "La unidad no puede exceder 20 caracteres")
     private String unidad;
     
+    @DecimalMin(value = "0.0", message = "El rango de peso mínimo no puede ser negativo")
+    private BigDecimal rangoPesoMinKg;
+    
+    @DecimalMin(value = "0.0", message = "El rango de peso máximo no puede ser negativo")
+    private BigDecimal rangoPesoMaxKg;
+    
+    @DecimalMin(value = "0.0", message = "El rango de volumen mínimo no puede ser negativo")
+    private BigDecimal rangoVolumenMinM3;
+    
+    @DecimalMin(value = "0.0", message = "El rango de volumen máximo no puede ser negativo")
+    private BigDecimal rangoVolumenMaxM3;
+    
     @NotNull(message = "La fecha de vigencia desde es obligatoria")
     private LocalDate vigenciaDesde;
     

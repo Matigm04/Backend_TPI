@@ -196,11 +196,18 @@ public class CamionService {
         CamionDisponibleDTO dto = new CamionDisponibleDTO();
         dto.setId(camion.getId());
         dto.setDominio(camion.getDominio());
+        dto.setMarca(camion.getMarca());
+        dto.setModelo(camion.getModelo());
+        dto.setAño(camion.getAño());
         dto.setNombreTransportista(camion.getTransportista().getNombreCompleto());
         dto.setCapacidadPeso(camion.getCapacidadPeso());
         dto.setCapacidadVolumen(camion.getCapacidadVolumen());
         dto.setConsumoCombustible(camion.getConsumoCombustible());
         dto.setCostoPorKm(camion.getCostoPorKm());
+        dto.setDisponible(camion.getDisponible());
+        dto.setActivo(camion.getActivo());
+        dto.setFechaCreacion(camion.getFechaCreacion());
+        dto.setFechaActualizacion(camion.getFechaActualizacion());
         return dto;
     }
 }
