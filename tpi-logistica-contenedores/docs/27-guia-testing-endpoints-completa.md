@@ -1198,7 +1198,7 @@ Content-Type: application/json
 
 **📝 Nota:** Después de calcular la ruta, el sistema automáticamente actualiza la solicitud con `costoEstimado`, `tiempoEstimadoHoras` y `rutaId`.
 
-### 5. Asignar Camión a un Tramo
+### 5. Asignar Camión a un Tramo (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -1240,7 +1240,7 @@ Content-Type: application/json
 
 **📝 Nota:** El estado del tramo cambia de `ESTIMADO` a `ASIGNADO` y el camión queda reservado. La respuesta devuelve solo el tramo actualizado para mantener consistencia con los endpoints de iniciar/finalizar tramo.
 
-### 6. Iniciar Tramo
+### 6. Iniciar Tramo (Funciona)
 **Rol requerido:** TRANSPORTISTA
 
 ```
@@ -1265,7 +1265,7 @@ Authorization: Bearer <token-transportista>
 
 **📝 Nota:** El estado del tramo cambia de `ASIGNADO` a `INICIADO` y se registra la fecha/hora de inicio.
 
-### 7. Finalizar Tramo
+### 7. Finalizar Tramo (Funciona)
 **Rol requerido:** TRANSPORTISTA
 
 ```
@@ -1295,7 +1295,7 @@ Authorization: Bearer <token-transportista>
 - Se calcula el costo real y tiempo real
 - El sistema automáticamente actualiza la solicitud con `costoFinal` y `tiempoRealHoras`
 
-### 8. Desactivar Ruta
+### 8. Desactivar Ruta (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -1389,7 +1389,7 @@ grant_type=password
 
 ### Paso 1: Verificar Recursos Disponibles
 
-#### 1.1 Verificar Clientes
+#### 1.1 Verificar Clientes  (Funciona)
 
 ```
 GET http://localhost:8080/api/clientes
@@ -1400,18 +1400,26 @@ Authorization: Bearer TOKEN_OPERADOR
 ```json
 [
   {
-    "id": 4,
-    "nombre": "Juan",
-    "apellido": "Pérez",
-    "email": "juan.perez@email.com",
-    "activo": true
-  }
+        "id": 5,
+        "nombre": "Fran",
+        "apellido": "Torrens",
+        "dni": "4256789",
+        "email": "franTorrens@gmail.com",
+        "telefono": "+3516416675",
+        "direccion": "Av. Vélez Sarsfield 500",
+        "ciudad": "Córdoba",
+        "provincia": "Córdoba",
+        "codigoPostal": "5000",
+        "activo": true,
+        "fechaRegistro": "2025-11-13T13:03:24.41682",
+        "fechaActualizacion": "2025-11-13T13:05:24.829718"
+    }
 ]
 ```
 
-**✅ Validación:** Cliente con `id: 4` existe y está activo.
+**✅ Validación:** Cliente con `id: 5` existe y está activo.
 
-#### 1.2 Verificar Camiones Disponibles
+#### 1.2 Verificar Camiones Disponibles (Funciona)
 
 ```
 GET http://localhost:8080/api/camiones/disponibles
@@ -1422,20 +1430,27 @@ Authorization: Bearer TOKEN_OPERADOR
 ```json
 [
   {
-    "id": 1,
-    "patente": "AA123BB",
-    "marca": "Mercedes-Benz",
-    "modelo": "Actros 2651",
-    "capacidadCarga": 15000,
-    "estado": "DISPONIBLE",
-    "activo": true
-  }
+        "id": 2,
+        "dominio": "AD788RT",
+        "marca": "Scania",
+        "modelo": "R450",
+        "año": 2020,
+        "nombreTransportista": "Fran Molines Torrens",
+        "capacidadPeso": 2000.00,
+        "capacidadVolumen": 500.00,
+        "consumoCombustible": 0.40,
+        "costoPorKm": 180.00,
+        "disponible": true,
+        "activo": true,
+        "fechaCreacion": "2025-11-13T14:44:09.10202",
+        "fechaActualizacion": "2025-11-13T19:21:57.844239"
+    }
 ]
 ```
 
-**✅ Validación:** Camión con `id: 1` está disponible y su capacidad (15000 kg) es suficiente para nuestro contenedor (5000 kg).
+**✅ Validación:** Camión con `id: 2` está disponible y su capacidad (2000 kg) es suficiente para nuestro contenedor (500 kg de peso y 15 kg de volumen).
 
-#### 1.3 Verificar Tarifas Vigentes
+#### 1.3 Verificar Tarifas Vigentes (Funciona)
 
 ```
 GET http://localhost:8080/api/tarifas/vigentes
@@ -1446,21 +1461,30 @@ Authorization: Bearer TOKEN_OPERADOR
 ```json
 [
   {
-    "id": 1,
-    "tipoServicio": "ESTANDAR",
-    "costoPorKm": 100.00,
-    "costoFijoBase": 0.00,
-    "fechaVigenciaInicio": "2025-01-01T00:00:00",
-    "activa": true
-  }
+        "id": 2,
+        "tipo": "COSTO_KM_BASE",
+        "descripcion": "Tarifa base por kilometraje",
+        "valor": 1435.99,
+        "unidad": "$/litro",
+        "rangoPesoMinKg": null,
+        "rangoPesoMaxKg": null,
+        "rangoVolumenMinM3": null,
+        "rangoVolumenMaxM3": null,
+        "vigenciaDesde": "2025-02-01",
+        "vigenciaHasta": null,
+        "activo": true,
+        "fechaCreacion": "2025-11-13T19:29:34.434835",
+        "fechaActualizacion": "2025-11-13T19:29:34.43411"
+    }
 ]
 ```
+Tomar el id de la tarifa que luego se va a asignar, en este caso ID 2.
 
-**✅ Validación:** Tarifa estándar activa: $100 por km.
+**✅ Validación:** Tarifa estándar activa: $1435.99 por km.
 
 ---
 
-### Paso 2: Crear Solicitud de Traslado
+### Paso 2: Crear Solicitud de Traslado (Funciona)
 
 ```
 POST http://localhost:8080/api/solicitudes
@@ -1468,12 +1492,23 @@ Authorization: Bearer TOKEN_OPERADOR
 Content-Type: application/json
 
 {
-  "clienteId": 1,
+  "clienteId": 5,
+  "ubicacionOrigen": "Acoqnuija 3200, Córdoba",
+  "ubicacionDestino": "De los Toscanos 6581, Córdoba",
+  "fechaProgramada": "2025-12-15",
+  "observaciones": "Carga frágil, manejar con cuidado",
+  "tarifaId": 2,
   "contenedor": {
-    "identificacion": "CONT-E2E-TEST-001",
-    "peso": 5000.00,
+    "identificacion": "CONT-PRUEBA-002",
+    "peso": 500.00,
     "volumen": 15.00,
-    "direccionOrigen": "Juan de Garay 1755, Córdoba",
+    "largoM": 6.00,
+    "anchoM": 2.50,
+    "altoM": 2.60,
+    "estado": "DISPONIBLE",
+    "descripcion": "Contenedor refrigerado",
+    "clienteId": 5,
+    "direccionOrigen": "Aconquija 3200, Córdoba",
     "latitudOrigen": -31.403771,
     "longitudOrigen": -64.163894,
     "direccionDestino": "De los Toscanos 6581, Córdoba",
@@ -1486,137 +1521,141 @@ Content-Type: application/json
 **Resultado esperado (201 Created):**
 ```json
 {
-  "id": 10,
-  "numero": "SOL-20251112160530",
-  "estado": "PENDIENTE",
-  "clienteId": 1,
-  "contenedor": {
-    "id": 10,
-    "identificacion": "CONT-E2E-TEST-001",
-    "peso": 5000,
-    "volumen": 15,
-    "direccionOrigen": "Juan de Garay 1755, Córdoba",
-    "latitudOrigen": -31.403771,
-    "longitudOrigen": -64.163894,
-    "direccionDestino": "De los Toscanos 6581, Córdoba",
-    "latitudDestino": -31.340196,
-    "longitudDestino": -64.224319
-  },
-  "costoEstimado": null,
-  "tiempoEstimadoHoras": null,
-  "costoFinal": null,
-  "tiempoRealHoras": null,
-  "rutaId": null,
-  "fechaCreacion": "2025-11-12T16:05:30"
-}
+        "id": 2,
+        "numero": "SOL-20251113193842",
+        "clienteId": 5,
+        "contenedor": {
+            "id": 2,
+            "identificacion": "CONT-PRUEBA-0061",
+            "peso": 500.00,
+            "volumen": 15.00,
+            "largoM": 6.00,
+            "anchoM": 2.50,
+            "altoM": 2.60,
+            "estado": "DISPONIBLE",
+            "descripcion": "Contenedor refrigerado",
+            "clienteId": 5,
+            "direccionOrigen": "Juan de Garay 1755, Córdoba",
+            "latitudOrigen": -31.403771,
+            "longitudOrigen": -64.163894,
+            "direccionDestino": "De los Toscanos 6581, Córdoba",
+            "latitudDestino": -31.340196,
+            "longitudDestino": -64.224319
+        },
+        "ubicacionOrigen": "Juan de Garay 1755, Córdoba",
+        "ubicacionDestino": "De los Toscanos 6581, Córdoba",
+        "estado": "BORRADOR",
+        "costoEstimado": null,
+        "tiempoEstimadoHoras": null,
+        "costoFinal": null,
+        "tiempoRealHoras": null,
+        "rutaId": null,
+        "tarifaId": 2,
+        "fechaSolicitud": "2025-11-13T19:38:42.577344",
+        "fechaProgramada": "2025-12-15",
+        "fechaEntregaEstimada": null,
+        "fechaEntregaReal": null,
+        "observaciones": "Carga frágil, manejar con cuidado",
+        "activo": true,
+        "fechaCreacion": "2025-11-13T19:38:42.612712",
+        "fechaActualizacion": "2025-11-13T19:38:42.612739"
+    }
+```
+La solicitud deberia manejar informacion hasta la informacion proporcionada por el contendor, ya que se duplica las ubicaciones y esto genera redundancia. Deberia terminar en la "longitudDestino" haciendo referencia al contenedor.
+
+Tomamos el id 2 de la solicitud
+
 ```
 
 **✅ Validaciones:**
-- Solicitud creada con ID: `10`
+- Solicitud creada con ID: `2`
 - Estado inicial: `PENDIENTE`
 - Campos de costo y ruta en `null` (aún no calculados)
 - Contenedor asociado correctamente
 
-**📝 Guarda el `id: 10` como `SOLICITUD_ID`**
+**📝 Guarda:**
+- `id: 10` como `SOLICITUD_ID`
+- `rutaId` (creado automáticamente al crear la solicitud)
+- `contenedores[0].id` como `CONTENEDOR_ID`
 
 ---
 
-### Paso 3: Calcular Ruta Tentativa
-
-```
-POST http://localhost:8080/api/rutas/calcular
-Authorization: Bearer TOKEN_OPERADOR
-Content-Type: application/json
-
-{
-  "solicitudId": 10
-}
 ```
 
-**Resultado esperado (201 Created):**
-```json
-{
-  "id": 20,
-  "solicitudId": 10,
-  "cantidadTramos": 1,
-  "cantidadDepositos": 0,
-  "distanciaTotalKm": 9.50,
-  "costoEstimado": 950.00,
-  "tiempoEstimadoHoras": 1,
-  "activa": true,
-  "tramos": [
-    {
-      "id": 40,
-      "orden": 1,
-      "origenTipo": "ORIGEN",
-      "origenDireccion": "Juan de Garay 1755, Córdoba",
-      "origenLatitud": -31.403771,
-      "origenLongitud": -64.163894,
-      "destinoTipo": "DESTINO",
-      "destinoDireccion": "De los Toscanos 6581, Córdoba",
-      "destinoLatitud": -31.340196,
-      "destinoLongitud": -64.224319,
-      "tipoTramo": "ORIGEN_DESTINO",
-      "estado": "ESTIMADO",
-      "distanciaKm": 9.50,
-      "costoAproximado": 950.00,
-      "tiempoEstimadoHoras": 1,
-      "camionId": null,
-      "fechaHoraInicio": null,
-      "fechaHoraFin": null,
-      "costoReal": null
-    }
-  ],
-  "fechaCreacion": "2025-11-12T16:06:15"
-}
-```
+### Paso 3: Consultar Ruta Creada Automáticamente  (Funciona)
 
-**✅ Validaciones:**
-- Ruta creada con ID: `20`
-- Distancia calculada: `9.50 km`
-- Costo estimado: `$950.00` (9.50 km × $100/km)
-- Tiempo estimado: `1 hora`
-- Tramo único (origen → destino directo, sin depósitos intermedios)
-- Estado del tramo: `ESTIMADO`
-- Camión aún no asignado
-
-**📝 Guarda:**
-- `id: 20` como `RUTA_ID`
-- `tramos[0].id: 40` como `TRAMO_ID`
-
-#### 3.1 Verificar Sincronización con Solicitud
+**ℹ️ Nota:** La ruta se crea automáticamente al crear la solicitud. No es necesario llamar a `/api/rutas/calcular` ya que esto generaría un error de constraint de unicidad (una solicitud solo puede tener una ruta).
 
 ```
-GET http://localhost:8080/api/solicitudes/10
+GET http://localhost:8080/api/rutas/solicitud/2
 Authorization: Bearer TOKEN_OPERADOR
 ```
 
 **Resultado esperado (200 OK):**
 ```json
 {
-  "id": 10,
-  "numero": "SOL-20251112160530",
-  "estado": "PENDIENTE",
-  "clienteId": 1,
-  "contenedor": { ... },
-  "costoEstimado": 950.00,
-  "tiempoEstimadoHoras": 1,
-  "costoFinal": null,
-  "tiempoRealHoras": null,
-  "rutaId": 20,
-  "fechaCreacion": "2025-11-12T16:05:30"
+    "id": 2,
+    "solicitudId": 2,
+    "cantidadTramos": 1,
+    "cantidadDepositos": 0,
+    "distanciaTotalKm": 9.10,
+    "costoEstimado": 910.00,
+    "costoTotalReal": null,
+    "tiempoEstimadoHoras": 1,
+    "estado": null,
+    "activa": true,
+    "tramos": [
+        {
+            "id": 2,
+            "orden": 1,
+            "origenTipo": "ORIGEN",
+            "origenDireccion": "Juan de Garay 1755, Córdoba",
+            "destinoTipo": "DESTINO",
+            "destinoDireccion": "De los Toscanos 6581, Córdoba",
+            "tipoTramo": "ORIGEN_DESTINO",
+            "estado": "ESTIMADO",
+            "distanciaKm": 9.10,
+            "costoAproximado": 910.00,
+            "costoReal": null,
+            "fechaHoraInicioEstimada": null,
+            "fechaHoraFinEstimada": null,
+            "fechaHoraInicio": null,
+            "fechaHoraFin": null,
+            "observaciones": null,
+            "camionId": null
+        }
+    ],
+    "fechaCreacion": "2025-11-13T20:02:30.532628",
+    "fechaActualizacion": "2025-11-13T20:02:30.532665"
 }
 ```
 
 **✅ Validaciones:**
-- `costoEstimado`: `950.00` (✅ sincronizado desde ruta)
-- `tiempoEstimadoHoras`: `1` (✅ sincronizado desde ruta)
-- `rutaId`: `20` (✅ asociada a la ruta)
-- `costoFinal` y `tiempoRealHoras`: aún `null` (se actualizarán al finalizar)
+- Ruta creada automáticamente con la solicitud
+- **Distancia calculada usando Google Maps Distance Matrix API** (distancia real por carreteras)
+- **Costo calculado con tarifa real de la solicitud** (no valor hardcodeado)
+- Fórmula: `distanciaKm × precioPorKm` de la tarifa asociada
+- Ejemplo: Si distancia = 9.10 km y tarifa ID 2 tiene `precioPorKm: 1435.99`:
+  - Costo estimado = 9.10 × 1435.99 = **$13,067.51**
+- Tiempo estimado calculado según velocidad promedio (60 km/h)
+- Tramo único (origen → destino directo, sin depósitos intermedios)
+- Estado de la ruta: `PLANIFICADA`
+- Estado del tramo: `ESTIMADO`
+- Camión aún no asignado
 
----
+**🔧 Implementación técnica:**
+- Google Maps API Key configurada en `docker-compose.yml`
+- API: `https://maps.googleapis.com/maps/api/distancematrix/json`
+- Parámetros: `origins`, `destinations`, `mode=driving`, `units=metric`
+- Fallback: Si Google Maps falla, usa fórmula de Haversine (distancia en línea recta)
+- Tarifa obtenida dinámicamente desde `tarifas-service` usando `tarifaId` de la solicitud
 
-### Paso 4: Asignar Camión al Tramo
+**📝 Guarda:**
+- `id: 2` como `RUTA_ID`
+- `tramos[0].id: 2` como `TRAMO_ID`
+
+
+### Paso 4: Asignar Camión al Tramo   (Funciona)
 
 ```
 POST http://localhost:8080/api/rutas/tramos/40/asignar-camion
@@ -1624,42 +1663,36 @@ Authorization: Bearer TOKEN_OPERADOR
 Content-Type: application/json
 
 {
-  "camionId": 1
+  "camionId": 2
 }
 ```
 
 **Resultado esperado (200 OK):**
 ```json
 {
-  "id": 20,
-  "solicitudId": 10,
-  "cantidadTramos": 1,
-  "cantidadDepositos": 0,
-  "distanciaTotalKm": 9.50,
-  "costoEstimado": 950.00,
-  "tiempoEstimadoHoras": 1,
-  "activa": true,
-  "tramos": [
-    {
-      "id": 40,
-      "orden": 1,
-      "estado": "ASIGNADO",
-      "distanciaKm": 9.50,
-      "costoAproximado": 950.00,
-      "tiempoEstimadoHoras": 1,
-      "camionId": 1,
-      "fechaHoraInicio": null,
-      "fechaHoraFin": null,
-      ...
-    }
-  ],
-  "fechaCreacion": "2025-11-12T16:06:15"
+    "id": 2,
+    "orden": 1,
+    "origenTipo": "ORIGEN",
+    "origenDireccion": "Juan de Garay 1755, Córdoba",
+    "destinoTipo": "DESTINO",
+    "destinoDireccion": "De los Toscanos 6581, Córdoba",
+    "tipoTramo": "ORIGEN_DESTINO",
+    "estado": "ASIGNADO",
+    "distanciaKm": 9.10,
+    "costoAproximado": 910.00,
+    "costoReal": null,
+    "fechaHoraInicioEstimada": null,
+    "fechaHoraFinEstimada": null,
+    "fechaHoraInicio": null,
+    "fechaHoraFin": null,
+    "observaciones": null,
+    "camionId": 2
 }
 ```
 
 **✅ Validaciones:**
 - Estado del tramo cambió: `ESTIMADO` → `ASIGNADO`
-- `camionId`: `1` (camión Mercedes-Benz AA123BB asignado)
+- `camionId`: `2` 
 
 #### 4.1 Verificar Estado del Camión
 

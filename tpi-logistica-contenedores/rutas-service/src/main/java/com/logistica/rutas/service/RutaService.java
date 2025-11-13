@@ -6,6 +6,7 @@ import com.logistica.rutas.dto.ContenedorDTO;
 import com.logistica.rutas.dto.RutaRequestDTO;
 import com.logistica.rutas.dto.RutaResponseDTO;
 import com.logistica.rutas.dto.SolicitudDTO;
+import com.logistica.rutas.dto.TarifaDTO;
 import com.logistica.rutas.dto.TramoResponseDTO;
 import com.logistica.rutas.exception.CamionNoDisponibleException;
 import com.logistica.rutas.exception.RutaNotFoundException;
@@ -45,6 +46,9 @@ public class RutaService {
     @Value("${services.camiones.url}")
     private String camionesServiceUrl;
 
+    @Value("${services.tarifas.url}")
+    private String tarifasServiceUrl;
+
     @Transactional
     public RutaResponseDTO calcularRutaTentativa(RutaRequestDTO request) {
         log.info("Calculando ruta tentativa para solicitud ID: {}", request.getSolicitudId());
@@ -75,7 +79,7 @@ public class RutaService {
         if (request.getDepositosIds() == null || request.getDepositosIds().isEmpty()) {
             // Ruta directa origen -> destino
             BigDecimal distancia = distanciaService.calcularDistancia(latOrigen, lonOrigen, latDestino, lonDestino);
-            BigDecimal costo = calcularCostoAproximado(distancia);
+            BigDecimal costo = calcularCostoConTarifa(distancia, solicitud.getTarifaId());
 
             Tramo tramo = crearTramo(1, TipoPunto.ORIGEN, null, dirOrigen, latOrigen, lonOrigen,
                                      TipoPunto.DESTINO, null, dirDestino, latDestino, lonDestino,
@@ -173,6 +177,18 @@ public class RutaService {
         // Obtener la ruta para actualizar costos finales
         Ruta ruta = tramoActualizado.getRuta();
         if (ruta != null) {
+            // Recalcular costo total real de la ruta sumando todos los tramos finalizados
+            BigDecimal costoTotalReal = ruta.getTramos().stream()
+                .filter(t -> t.getCostoReal() != null)
+                .map(Tramo::getCostoReal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+            if (costoTotalReal.compareTo(BigDecimal.ZERO) > 0) {
+                ruta.setCostoTotalReal(costoTotalReal);
+                rutaRepository.save(ruta);
+                log.info("Costo total real de ruta {} actualizado a: ${}", ruta.getId(), costoTotalReal);
+            }
+            
             // Actualizar la solicitud con costos finales y tiempo real
             actualizarSolicitudConCostos(ruta.getSolicitudId(), null, null, 
                                          tramo.getCostoReal(), tiempoRealHoras, null);
@@ -293,6 +309,26 @@ public class RutaService {
         // Costo base por km (ejemplo: $100 por km)
         BigDecimal costoPorKm = new BigDecimal("100.00");
         return distanciaKm.multiply(costoPorKm);
+    }
+
+    private BigDecimal calcularCostoConTarifa(BigDecimal distanciaKm, Long tarifaId) {
+        try {
+            String url = tarifasServiceUrl + "/api/tarifas/" + tarifaId;
+            TarifaDTO tarifa = restTemplate.getForObject(url, TarifaDTO.class);
+            
+            if (tarifa != null && tarifa.getValor() != null) {
+                BigDecimal costo = distanciaKm.multiply(tarifa.getValor());
+                log.info("Costo calculado con tarifa ID {}: {} km × ${}/km = ${}",
+                        tarifaId, distanciaKm, tarifa.getValor(), costo);
+                return costo;
+            } else {
+                log.warn("Tarifa no encontrada o sin precio, usando costo aproximado");
+                return calcularCostoAproximado(distanciaKm);
+            }
+        } catch (Exception e) {
+            log.error("Error al obtener tarifa ID {}: {}", tarifaId, e.getMessage());
+            return calcularCostoAproximado(distanciaKm);
+        }
     }
 
     private Integer calcularTiempoEstimado(BigDecimal distanciaKm) {

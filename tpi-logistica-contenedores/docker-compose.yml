@@ -183,7 +183,8 @@ services:
       DEPOSITOS_SERVICE_URL: http://depositos-service:8082
       CAMIONES_SERVICE_URL: http://camiones-service:8083
       TARIFAS_SERVICE_URL: http://tarifas-service:8084
-      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      GOOGLE_MAPS_API_KEY: AIzaSyAUp0j1WFgacoQYTKhtPI-CF6Ld7a7jHSg
+      GOOGLE_MAPS_ENABLED: true
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/logistica-realm
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/logistica-realm/protocol/openid-connect/certs
     ports:

@@ -8,6 +8,7 @@ public class SolicitudDTO {
     private Long id;
     private String numero;
     private Long clienteId;
+    private Long tarifaId;
     private ContenedorDTO contenedor;
     private String estado;
 }

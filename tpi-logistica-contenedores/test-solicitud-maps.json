@@ -1,0 +1,25 @@
+{
+  "clienteId": 5,
+  "ubicacionOrigen": "Av. Padre Antonio María Claret 6300, Córdoba",
+  "ubicacionDestino": "Vicente Fatone 3056, Córdoba",
+  "fechaProgramada": "2025-12-20",
+  "observaciones": "Prueba con Google Maps y tarifa real",
+  "tarifaId": 2,
+  "contenedor": {
+    "identificacion": "CONT-MAPS-001",
+    "peso": 450.00,
+    "volumen": 12.00,
+    "largoM": 5.00,
+    "anchoM": 2.40,
+    "altoM": 2.50,
+    "estado": "DISPONIBLE",
+    "descripcion": "Contenedor de prueba Google Maps",
+    "clienteId": 5,
+    "direccionOrigen": "Av. Padre Antonio María Claret 6300, Córdoba",
+    "latitudOrigen": -31.342515689097226,
+    "longitudOrigen": -64.23571071051997,
+    "direccionDestino": "Vicente Fatone 3056, Córdoba",
+    "latitudDestino": -31.361078237572773,
+    "longitudDestino": -64.21225621565107
+  }
+}

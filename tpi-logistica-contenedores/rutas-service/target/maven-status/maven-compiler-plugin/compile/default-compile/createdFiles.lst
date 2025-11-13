@@ -3,6 +3,7 @@ com\logistica\rutas\dto\ContenedorDTO.class
 com\logistica\rutas\model\Tramo.class
 com\logistica\rutas\dto\googlemaps\GoogleMapsDistanceResponse$Distance.class
 com\logistica\rutas\dto\googlemaps\GoogleMapsDistanceResponse.class
+com\logistica\rutas\dto\TarifaDTO.class
 com\logistica\rutas\dto\googlemaps\GoogleMapsDistanceResponse$Row.class
 com\logistica\rutas\RutasServiceApplication.class
 com\logistica\rutas\config\OpenApiConfig.class
