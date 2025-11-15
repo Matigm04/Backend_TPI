@@ -1,5 +1,6 @@
 package com.logistica.rutas.service;
 
+import com.logistica.rutas.dto.DistanciaYTiempoDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,33 @@ public class DistanciaService {
     }
 
     /**
+     * Calcula la distancia y tiempo entre dos puntos usando Google Maps API o Haversine
+     */
+    public DistanciaYTiempoDTO calcularDistanciaYTiempo(double lat1, double lon1, double lat2, double lon2) {
+        if (googleMapsEnabled) {
+            try {
+                BigDecimal distancia = googleMapsService.calcularDistancia(lat1, lon1, lat2, lon2);
+                Long tiempoMinutos = googleMapsService.calcularTiempoViaje(lat1, lon1, lat2, lon2);
+                
+                return DistanciaYTiempoDTO.builder()
+                        .distanciaKm(distancia)
+                        .tiempoMinutos(tiempoMinutos.intValue())
+                        .build();
+            } catch (Exception e) {
+                log.warn("Error al usar Google Maps API, usando Haversine como fallback: {}", e.getMessage());
+                return calcularConHaversine(lat1, lon1, lat2, lon2);
+            }
+        } else {
+            return calcularConHaversine(lat1, lon1, lat2, lon2);
+        }
+    }
+
+    /**
      * Calcula la distancia entre dos puntos usando la fórmula de Haversine
      * o Google Maps API si está habilitada
+     * @deprecated Usar calcularDistanciaYTiempo() en su lugar
      */
+    @Deprecated
     public BigDecimal calcularDistancia(double lat1, double lon1, double lat2, double lon2) {
         if (googleMapsEnabled) {
             try {
@@ -35,6 +60,25 @@ public class DistanciaService {
         } else {
             return calcularDistanciaHaversine(lat1, lon1, lat2, lon2);
         }
+    }
+    
+    /**
+     * Calcula distancia y tiempo usando Haversine y estimación simple
+     */
+    private DistanciaYTiempoDTO calcularConHaversine(double lat1, double lon1, double lat2, double lon2) {
+        BigDecimal distancia = calcularDistanciaHaversine(lat1, lon1, lat2, lon2);
+        
+        // Estimar tiempo: 50 km/h promedio
+        int tiempoMinutos = distancia.divide(BigDecimal.valueOf(50), 2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(60))
+                .intValue();
+        
+        log.debug("Tiempo estimado con Haversine: {} minutos", tiempoMinutos);
+        
+        return DistanciaYTiempoDTO.builder()
+                .distanciaKm(distancia)
+                .tiempoMinutos(Math.max(tiempoMinutos, 30)) // Mínimo 30 minutos
+                .build();
     }
 
     /**

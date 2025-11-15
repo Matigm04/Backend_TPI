@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class SolicitudController {
     private final SolicitudService solicitudService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('CLIENTE', 'OPERADOR')")
     @Operation(summary = "Crear nueva solicitud", description = "Crea una nueva solicitud de transporte con su contenedor")
     public ResponseEntity<SolicitudResponseDTO> crearSolicitud(@Valid @RequestBody SolicitudRequestDTO request) {
         SolicitudResponseDTO response = solicitudService.crearSolicitud(request);
@@ -67,6 +69,7 @@ public class SolicitudController {
     }
 
     @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Actualizar estado de solicitud")
     public ResponseEntity<SolicitudResponseDTO> actualizarEstado(
             @PathVariable Long id,
@@ -76,6 +79,7 @@ public class SolicitudController {
     }
 
     @PatchMapping("/{id}/costos-tiempos")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Actualizar costos y tiempos de solicitud", 
                description = "Endpoint interno para que rutas-service actualice los costos estimados/finales y tiempos")
     public ResponseEntity<SolicitudResponseDTO> actualizarCostosYTiempos(

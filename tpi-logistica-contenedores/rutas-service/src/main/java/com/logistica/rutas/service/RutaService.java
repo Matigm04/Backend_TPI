@@ -3,6 +3,7 @@ package com.logistica.rutas.service;
 import com.logistica.rutas.dto.ActualizarCostosDTO;
 import com.logistica.rutas.dto.AsignarCamionDTO;
 import com.logistica.rutas.dto.ContenedorDTO;
+import com.logistica.rutas.dto.DistanciaYTiempoDTO;
 import com.logistica.rutas.dto.RutaRequestDTO;
 import com.logistica.rutas.dto.RutaResponseDTO;
 import com.logistica.rutas.dto.SolicitudDTO;
@@ -78,7 +79,10 @@ public class RutaService {
 
         if (request.getDepositosIds() == null || request.getDepositosIds().isEmpty()) {
             // Ruta directa origen -> destino
-            BigDecimal distancia = distanciaService.calcularDistancia(latOrigen, lonOrigen, latDestino, lonDestino);
+            DistanciaYTiempoDTO distanciaYTiempo = distanciaService.calcularDistanciaYTiempo(
+                latOrigen, lonOrigen, latDestino, lonDestino);
+            
+            BigDecimal distancia = distanciaYTiempo.getDistanciaKm();
             BigDecimal costo = calcularCostoConTarifa(distancia, solicitud.getTarifaId());
 
             Tramo tramo = crearTramo(1, TipoPunto.ORIGEN, null, dirOrigen, latOrigen, lonOrigen,
@@ -89,6 +93,13 @@ public class RutaService {
 
             distanciaTotal = distancia;
             costoTotal = costo;
+            
+            // Convertir tiempo de minutos a horas (redondeando hacia arriba)
+            Integer tiempoMinutos = distanciaYTiempo.getTiempoMinutos();
+            Integer tiempoHoras = (int) Math.ceil(tiempoMinutos / 60.0);
+            ruta.setTiempoEstimadoHoras(Math.max(1, tiempoHoras)); // Mínimo 1 hora
+            
+            log.info("Tiempo calculado: {} minutos ({} hora(s))", tiempoMinutos, tiempoHoras);
         } else {
             // Ruta con depósitos intermedios
             // TODO: Implementar lógica completa con depósitos
@@ -98,8 +109,14 @@ public class RutaService {
         ruta.setCantidadTramos(tramos.size());
         ruta.setDistanciaTotalKm(distanciaTotal);
         ruta.setCostoEstimado(costoTotal);
-        Integer tiempoEstimado = calcularTiempoEstimado(distanciaTotal);
-        ruta.setTiempoEstimadoHoras(tiempoEstimado);
+        
+        // Si no se estableció el tiempo en el flujo anterior (rutas con depósitos), calcularlo
+        if (ruta.getTiempoEstimadoHoras() == null) {
+            Integer tiempoEstimado = calcularTiempoEstimado(distanciaTotal);
+            ruta.setTiempoEstimadoHoras(tiempoEstimado);
+        }
+        
+        Integer tiempoEstimado = ruta.getTiempoEstimadoHoras();
 
         Ruta rutaGuardada = rutaRepository.save(ruta);
         log.info("Ruta tentativa calculada exitosamente con ID: {}", rutaGuardada.getId());
@@ -331,9 +348,15 @@ public class RutaService {
         }
     }
 
+    /**
+     * Calcula tiempo estimado basado solo en distancia (fallback)
+     * Este método solo se usa cuando no se puede obtener el tiempo de Google Maps
+     * @deprecated Usar DistanciaService.calcularDistanciaYTiempo() que obtiene el tiempo real de Google Maps
+     */
+    @Deprecated
     private Integer calcularTiempoEstimado(BigDecimal distanciaKm) {
-        // Velocidad promedio: 60 km/h
-        return distanciaKm.divide(new BigDecimal("60"), 0, BigDecimal.ROUND_UP).intValue();
+        // Velocidad promedio: 50 km/h, mínimo 1 hora
+        return Math.max(1, distanciaKm.divide(new BigDecimal("50"), 0, BigDecimal.ROUND_UP).intValue());
     }
 
     private RutaResponseDTO mapToResponseDTO(Ruta ruta) {

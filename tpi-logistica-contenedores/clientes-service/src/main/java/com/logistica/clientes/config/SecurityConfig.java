@@ -34,15 +34,7 @@ public class SecurityConfig {
                 // Endpoints públicos (Swagger, Actuator)
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
                 
-                // Endpoints de clientes - Solo ADMIN y OPERADOR pueden crear/actualizar/eliminar
-                .requestMatchers(HttpMethod.POST, "/api/clientes").hasAnyRole("ADMIN", "OPERADOR")
-                .requestMatchers(HttpMethod.PUT, "/api/clientes/**").hasAnyRole("ADMIN", "OPERADOR")
-                .requestMatchers(HttpMethod.DELETE, "/api/clientes/**").hasRole("ADMIN")
-                
-                // Endpoints de consulta - Todos los roles autenticados
-                .requestMatchers(HttpMethod.GET, "/api/clientes/**").authenticated()
-                
-                // Cualquier otra petición requiere autenticación
+                // La seguridad específica de roles se maneja con @PreAuthorize en los controladores
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

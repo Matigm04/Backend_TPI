@@ -92,7 +92,7 @@ public class Solicitud {
             fechaSolicitud = LocalDateTime.now();
         }
         if (estado == null) {
-            estado = EstadoSolicitud.BORRADOR;
+            estado = EstadoSolicitud.PENDIENTE;
         }
     }
 

@@ -74,7 +74,7 @@ public class SolicitudService {
             .contenedor(contenedor)
             .ubicacionOrigen(request.getUbicacionOrigen())
             .ubicacionDestino(request.getUbicacionDestino())
-            .estado(EstadoSolicitud.BORRADOR)
+            .estado(EstadoSolicitud.PENDIENTE)
             .fechaSolicitud(LocalDateTime.now())
             .fechaProgramada(request.getFechaProgramada())
             .observaciones(request.getObservaciones())
@@ -214,7 +214,7 @@ public class SolicitudService {
 
     private String generarMensajeSeguimiento(Solicitud solicitud) {
         return switch (solicitud.getEstado()) {
-            case BORRADOR -> "Su solicitud ha sido registrada y está pendiente de programación.";
+            case PENDIENTE -> "Su solicitud ha sido registrada y está pendiente de programación.";
             case PROGRAMADA -> "Su solicitud ha sido programada. El contenedor será retirado próximamente.";
             case EN_TRANSITO -> "Su contenedor está en tránsito hacia el destino.";
             case ENTREGADA -> "Su contenedor ha sido entregado exitosamente.";
@@ -224,7 +224,7 @@ public class SolicitudService {
 
     private String determinarUbicacionActual(Solicitud solicitud) {
         return switch (solicitud.getEstado()) {
-            case BORRADOR, PROGRAMADA -> solicitud.getContenedor().getDireccionOrigen();
+            case PENDIENTE, PROGRAMADA -> solicitud.getContenedor().getDireccionOrigen();
             case EN_TRANSITO -> "En tránsito";
             case ENTREGADA -> solicitud.getContenedor().getDireccionDestino();
             case CANCELADA -> "N/A";

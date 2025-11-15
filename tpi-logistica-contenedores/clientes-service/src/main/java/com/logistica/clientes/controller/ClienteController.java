@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class ClienteController {
     private final ClienteService clienteService;
 
     @PostMapping
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Crear un nuevo cliente", description = "Registra un nuevo cliente en el sistema")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Cliente creado exitosamente"),
@@ -99,6 +101,7 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Actualizar cliente", description = "Actualiza los datos de un cliente existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cliente actualizado exitosamente"),
@@ -137,10 +140,12 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar cliente", description = "Elimina permanentemente un cliente del sistema")
+    @PreAuthorize("hasRole('OPERADOR')")
+    @Operation(summary = "Eliminar cliente", description = "Desactiva un cliente del sistema (eliminación lógica)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Cliente eliminado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+            @ApiResponse(responseCode = "401", description = "No autorizado")
     })
     public ResponseEntity<Void> eliminarCliente(
             @Parameter(description = "ID del cliente") @PathVariable Long id) {

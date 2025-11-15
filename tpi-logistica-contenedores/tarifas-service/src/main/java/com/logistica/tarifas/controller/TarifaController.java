@@ -84,7 +84,7 @@ public class TarifaController {
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Eliminar tarifa", description = "Desactiva una tarifa del sistema")
     public ResponseEntity<Void> eliminarTarifa(@PathVariable Long id) {
         tarifaService.eliminarTarifa(id);

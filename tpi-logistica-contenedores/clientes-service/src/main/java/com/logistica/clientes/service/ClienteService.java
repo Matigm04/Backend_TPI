@@ -82,8 +82,8 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public List<ClienteResponseDTO> obtenerTodosLosClientes() {
-        log.info("Obteniendo todos los clientes");
-        return clienteRepository.findAll().stream()
+        log.info("Obteniendo todos los clientes activos");
+        return clienteRepository.findByActivo(true).stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }
@@ -170,12 +170,13 @@ public class ClienteService {
     public void eliminarCliente(Long id) {
         log.info("Eliminando cliente con ID: {}", id);
 
-        if (!clienteRepository.existsById(id)) {
-            throw new ClienteNotFoundException("Cliente no encontrado con ID: " + id);
-        }
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con ID: " + id));
 
-        clienteRepository.deleteById(id);
-        log.info("Cliente eliminado exitosamente con ID: {}", id);
+        cliente.setActivo(false);
+        clienteRepository.save(cliente);
+        
+        log.info("Cliente eliminado (desactivado) exitosamente con ID: {}", id);
     }
 
     private ClienteResponseDTO mapToResponseDTO(Cliente cliente) {

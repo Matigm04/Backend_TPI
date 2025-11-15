@@ -165,8 +165,8 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Cliente actualizado
 
-### 5. Desactivar Cliente  (Funciona)
-**Rol requerido:** Admin
+### 5. Desactivar Cliente (Eliminación Lógica)  (Funciona)
+**Rol requerido:** OPERADOR
 
 ```
 DELETE http://localhost:8080/api/clientes/5
@@ -174,6 +174,8 @@ Authorization: Bearer <token-operador>
 ```
 
 **Respuesta esperada (204 No Content)**
+
+**📝 Nota:** Este endpoint realiza una **eliminación lógica** (soft delete), estableciendo `activo = false`. El cliente no se elimina físicamente de la base de datos, pero dejará de aparecer en los listados. Esto preserva la integridad referencial y permite auditoría completa.
 
 ---
 
@@ -567,7 +569,7 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Camión actualizado
 
-### 12. Desactivar Camión (Funciona)
+### 12. Desactivar Camión (Eliminación Lógica) (Funciona)
 **Rol requerido:** OPERADOR
 
 ```
@@ -576,6 +578,8 @@ Authorization: Bearer <token-operador>
 ```
 
 **Respuesta esperada (204 No Content)**
+
+**📝 Nota:** Este endpoint realiza una **eliminación lógica** (soft delete), estableciendo `activo = false`. El camión no se elimina físicamente de la base de datos.
 
 ---
 
@@ -711,8 +715,8 @@ Content-Type: application/json
 
 **Respuesta esperada (200 OK):** Tarifa actualizada
 
-### 6. Desactivar Tarifa (Funciona)
-**Rol requerido:** Admin
+### 6. Desactivar Tarifa (Eliminación Lógica) (Funciona)
+**Rol requerido:** OPERADOR
 
 ```
 DELETE http://localhost:8080/api/tarifas/3
@@ -720,6 +724,8 @@ Authorization: Bearer <token-operador>
 ```
 
 **Respuesta esperada (204 No Content)**
+
+**📝 Nota:** Este endpoint realiza una **eliminación lógica** (soft delete), estableciendo `activo = false`. La tarifa no se elimina físicamente de la base de datos.
 
 ---
 
@@ -825,7 +831,7 @@ Content-Type: application/json
 {
   "id": 6,
   "numero": "SOL-20251112153045",
-  "estado": "BORRADOR",
+  "estado": "PENDIENTE",
   "clienteId": 1,
   "ubicacionOrigen": "Juan de Garay 1755, Córdoba",
   "ubicacionDestino": "De los Toscanos 6581, Córdoba",
@@ -859,6 +865,8 @@ Content-Type: application/json
   "fechaCreacion": "2025-11-12T15:30:45",
   "fechaActualizacion": "2025-11-12T15:30:45"
 }
+
+**📝 Nota:** El estado inicial es ahora **PENDIENTE** (antes era BORRADOR). Las solicitudes son solicitudes formales que están pendientes de procesamiento, no borradores.
 ```
 
 ### 5. Cancelar Solicitud (Funciona)
@@ -877,17 +885,28 @@ Authorization: Bearer <token-operador>
 
 **Respuesta esperada (200 OK):** Solicitud con estado `CANCELADA`
 
-### 6. Cambiar Estado de Solicitud (Funciona)
+### 6. Cambiar Estado de Solicitud Manualmente (Funciona)
 **Rol requerido:** OPERADOR
 
+**⚠️ IMPORTANTE:** Este endpoint es para cambios manuales excepcionales. En el flujo normal, los estados se actualizan automáticamente:
+- `PENDIENTE` → `PROGRAMADA` (cuando se asigna el primer camión)
+- `PROGRAMADA` → `EN_TRANSITO` (cuando se inicia el primer tramo)
+- `EN_TRANSITO` → `ENTREGADA` (cuando se finalizan todos los tramos)
+
+Para cancelar una solicitud manualmente:
+
 ```
-PATCH http://localhost:8080/api/solicitudes/6/estado?estado=EN_PROCESO
+PATCH http://localhost:8080/api/solicitudes/6/estado?estado=CANCELADA
 Authorization: Bearer <token-operador>
 ```
 
-**Estados válidos:** `PENDIENTE`, `EN_PROCESO`, `COMPLETADA`, `CANCELADA`
+**Estados válidos:** `PENDIENTE`, `PROGRAMADA`, `EN_TRANSITO`, `ENTREGADA`, `CANCELADA`
 
 **Respuesta esperada (200 OK):** Solicitud con estado actualizado
+
+**📝 Nota:** Solo usa este endpoint para:
+- Cancelar solicitudes (`CANCELADA`)
+- Correcciones manuales excepcionales
 
 ### 7. Actualizar Costos y Tiempos (Endpoint de Sincronización)
 **Rol requerido:** OPERADOR (uso interno del sistema)
@@ -1093,8 +1112,8 @@ Authorization: Bearer <token-operador>
     "solicitudId": 1,
     "cantidadTramos": 1,
     "cantidadDepositos": 0,
-    "distanciaTotalKm": 9.50,
-    "costoEstimado": 950.00,
+    "distanciaTotalKm": 18.57,
+    "costoEstimado": 26666.33,
     "costoTotalReal": null,
     "tiempoEstimadoHoras": 1,
     "estado": "PLANIFICADA",
@@ -1109,8 +1128,8 @@ Authorization: Bearer <token-operador>
         "destinoDireccion": "De los Toscanos 6581, Córdoba",
         "tipoTramo": "ORIGEN_DESTINO",
         "estado": "ESTIMADO",
-        "distanciaKm": 9.50,
-        "costoAproximado": 950.00,
+        "distanciaKm": 18.57,
+        "costoAproximado": 26666.33,
         "costoReal": null,
         "fechaHoraInicioEstimada": "2025-12-15T08:00:00",
         "fechaHoraFinEstimada": "2025-12-15T09:00:00",
@@ -1196,7 +1215,18 @@ Content-Type: application/json
 }
 ```
 
-**📝 Nota:** Después de calcular la ruta, el sistema automáticamente actualiza la solicitud con `costoEstimado`, `tiempoEstimadoHoras` y `rutaId`.
+**📝 Notas importantes:**
+
+- **Google Maps Distance Matrix API:** El sistema utiliza la API de Google Maps para calcular distancias reales por carretera (cuando está habilitada). Si la API falla o está deshabilitada, utiliza la fórmula de Haversine como fallback (distancia en línea recta).
+
+- **Cálculo de Costos con Tarifas:** El costo estimado se calcula multiplicando la distancia real por el valor de la tarifa asociada a la solicitud. El sistema obtiene la tarifa desde `tarifas-service` usando el `tarifaId` de la solicitud.
+
+- **Ejemplo de cálculo:**
+  - Distancia (Google Maps): 18.57 km
+  - Tarifa (desde tarifas-service): $1,435.99/km
+  - Costo Estimado: 18.57 × $1,435.99 = **$26,666.33**
+
+- Después de calcular la ruta, el sistema automáticamente actualiza la solicitud con `costoEstimado`, `tiempoEstimadoHoras` y `rutaId`.
 
 ### 5. Asignar Camión a un Tramo (Funciona)
 **Rol requerido:** OPERADOR
@@ -1226,8 +1256,8 @@ Content-Type: application/json
   "destinoLongitud": -64.224319,
   "tipoTramo": "ORIGEN_DESTINO",
   "estado": "ASIGNADO",
-  "distanciaKm": 9.10,
-  "costoAproximado": 910.00,
+  "distanciaKm": 18.57,
+  "costoAproximado": 26666.33,
   "costoReal": null,
   "fechaHoraInicioEstimada": null,
   "fechaHoraFinEstimada": null,
@@ -1257,7 +1287,7 @@ Authorization: Bearer <token-transportista>
   "camionId": 1,
   "fechaHoraInicio": "2025-11-12T16:00:00",
   "fechaHoraFin": null,
-  "distanciaKm": 9.50,
+  "distanciaKm": 18.57,
   "costoReal": null,
   ...
 }
@@ -1282,18 +1312,21 @@ Authorization: Bearer <token-transportista>
   "camionId": 1,
   "fechaHoraInicio": "2025-11-12T16:00:00",
   "fechaHoraFin": "2025-11-12T17:15:00",
-  "distanciaKm": 9.50,
-  "costoReal": 950.00,
+  "distanciaKm": 18.57,
+  "costoReal": 26666.33,
   "tiempoRealHoras": 1,
   ...
 }
 ```
 
-**📝 Nota:** 
+**📝 Notas:**
 - El estado del tramo cambia de `INICIADO` a `FINALIZADO`
-- Se registra la fecha/hora de fin
-- Se calcula el costo real y tiempo real
-- El sistema automáticamente actualiza la solicitud con `costoFinal` y `tiempoRealHoras`
+- Se registra la fecha/hora de fin y se calcula el tiempo real
+- Se establece el `costoReal` del tramo (basado en el `costoAproximado` calculado con la tarifa)
+- **Cálculo automático del `costoTotalReal` de la ruta:** El sistema suma los `costoReal` de todos los tramos finalizados y actualiza el `costoTotalReal` de la ruta. Esto permite tener:
+  - `costoEstimado`: Calculado al crear la ruta (con Google Maps + tarifa real)
+  - `costoTotalReal`: Calculado al finalizar todos los tramos (suma de costos reales)
+- El sistema también actualiza la solicitud con `costoFinal` y `tiempoRealHoras`
 
 ### 8. Desactivar Ruta (Funciona)
 **Rol requerido:** OPERADOR
@@ -1400,24 +1433,24 @@ Authorization: Bearer TOKEN_OPERADOR
 ```json
 [
   {
-        "id": 5,
-        "nombre": "Fran",
-        "apellido": "Torrens",
-        "dni": "4256789",
-        "email": "franTorrens@gmail.com",
-        "telefono": "+3516416675",
-        "direccion": "Av. Vélez Sarsfield 500",
+        "id": 6,
+        "nombre": "Matias",
+        "apellido": "Gimenez",
+        "dni": "45594385",
+        "email": "matigm04@gmail.com",
+        "telefono": "+543516416675",
+        "direccion": "De los toscanos 6581",
         "ciudad": "Córdoba",
         "provincia": "Córdoba",
         "codigoPostal": "5000",
         "activo": true,
-        "fechaRegistro": "2025-11-13T13:03:24.41682",
-        "fechaActualizacion": "2025-11-13T13:05:24.829718"
+        "fechaRegistro": "2025-11-13T23:31:08.528599",
+        "fechaActualizacion": "2025-11-13T23:31:08.528624"
     }
 ]
 ```
 
-**✅ Validación:** Cliente con `id: 5` existe y está activo.
+**✅ Validación:** Cliente con `id: 6` existe y está activo.
 
 #### 1.2 Verificar Camiones Disponibles (Funciona)
 
@@ -1492,23 +1525,23 @@ Authorization: Bearer TOKEN_OPERADOR
 Content-Type: application/json
 
 {
-  "clienteId": 5,
-  "ubicacionOrigen": "Acoqnuija 3200, Córdoba",
+  "clienteId": 6,
+  "ubicacionOrigen": "Juan de Garay 1755, Córdoba",
   "ubicacionDestino": "De los Toscanos 6581, Córdoba",
   "fechaProgramada": "2025-12-15",
   "observaciones": "Carga frágil, manejar con cuidado",
   "tarifaId": 2,
   "contenedor": {
-    "identificacion": "CONT-PRUEBA-002",
-    "peso": 500.00,
+    "identificacion": "CONT-E2E-TEST-001",
+    "peso": 5000.00,
     "volumen": 15.00,
     "largoM": 6.00,
     "anchoM": 2.50,
     "altoM": 2.60,
     "estado": "DISPONIBLE",
-    "descripcion": "Contenedor refrigerado",
-    "clienteId": 5,
-    "direccionOrigen": "Aconquija 3200, Córdoba",
+    "descripcion": "Contenedor refrigerado de 20 pies",
+    "clienteId": 6,
+    "direccionOrigen": "Juan de Garay 1755, Córdoba",
     "latitudOrigen": -31.403771,
     "longitudOrigen": -64.163894,
     "direccionDestino": "De los Toscanos 6581, Córdoba",
@@ -1521,141 +1554,167 @@ Content-Type: application/json
 **Resultado esperado (201 Created):**
 ```json
 {
-        "id": 2,
-        "numero": "SOL-20251113193842",
-        "clienteId": 5,
-        "contenedor": {
-            "id": 2,
-            "identificacion": "CONT-PRUEBA-0061",
-            "peso": 500.00,
-            "volumen": 15.00,
-            "largoM": 6.00,
-            "anchoM": 2.50,
-            "altoM": 2.60,
-            "estado": "DISPONIBLE",
-            "descripcion": "Contenedor refrigerado",
-            "clienteId": 5,
-            "direccionOrigen": "Juan de Garay 1755, Córdoba",
-            "latitudOrigen": -31.403771,
-            "longitudOrigen": -64.163894,
-            "direccionDestino": "De los Toscanos 6581, Córdoba",
-            "latitudDestino": -31.340196,
-            "longitudDestino": -64.224319
-        },
-        "ubicacionOrigen": "Juan de Garay 1755, Córdoba",
-        "ubicacionDestino": "De los Toscanos 6581, Córdoba",
-        "estado": "BORRADOR",
-        "costoEstimado": null,
-        "tiempoEstimadoHoras": null,
-        "costoFinal": null,
-        "tiempoRealHoras": null,
-        "rutaId": null,
-        "tarifaId": 2,
-        "fechaSolicitud": "2025-11-13T19:38:42.577344",
-        "fechaProgramada": "2025-12-15",
-        "fechaEntregaEstimada": null,
-        "fechaEntregaReal": null,
-        "observaciones": "Carga frágil, manejar con cuidado",
-        "activo": true,
-        "fechaCreacion": "2025-11-13T19:38:42.612712",
-        "fechaActualizacion": "2025-11-13T19:38:42.612739"
-    }
-```
-La solicitud deberia manejar informacion hasta la informacion proporcionada por el contendor, ya que se duplica las ubicaciones y esto genera redundancia. Deberia terminar en la "longitudDestino" haciendo referencia al contenedor.
-
-Tomamos el id 2 de la solicitud
-
+  "id": 10,
+  "numero": "SOL-20251114160530",
+  "estado": "PENDIENTE",
+  "clienteId": 6,
+  "contenedor": {
+    "id": 10,
+    "identificacion": "CONT-E2E-TEST-001",
+    "peso": 5000.00,
+    "volumen": 15.00,
+    "largoM": 6.00,
+    "anchoM": 2.50,
+    "altoM": 2.60,
+    "estado": "DISPONIBLE",
+    "descripcion": "Contenedor refrigerado de 20 pies",
+    "clienteId": 6,
+    "direccionOrigen": "Juan de Garay 1755, Córdoba",
+    "latitudOrigen": -31.403771,
+    "longitudOrigen": -64.163894,
+    "direccionDestino": "De los Toscanos 6581, Córdoba",
+    "latitudDestino": -31.340196,
+    "longitudDestino": -64.224319
+  },
+  "ubicacionOrigen": "Juan de Garay 1755, Córdoba",
+  "ubicacionDestino": "De los Toscanos 6581, Córdoba",
+  "costoEstimado": null,
+  "tiempoEstimadoHoras": null,
+  "costoFinal": null,
+  "tiempoRealHoras": null,
+  "rutaId": null,
+  "tarifaId": 2,
+  "fechaSolicitud": "2025-11-14T16:05:30",
+  "fechaProgramada": "2025-12-15",
+  "fechaEntregaEstimada": null,
+  "fechaEntregaReal": null,
+  "observaciones": "Carga frágil, manejar con cuidado",
+  "activo": true,
+  "fechaCreacion": "2025-11-14T16:05:30",
+  "fechaActualizacion": "2025-11-14T16:05:30"
+}
 ```
 
 **✅ Validaciones:**
-- Solicitud creada con ID: `2`
-- Estado inicial: `PENDIENTE`
-- Campos de costo y ruta en `null` (aún no calculados)
-- Contenedor asociado correctamente
+- Solicitud creada con ID: `10`
+- **Estado inicial: `PENDIENTE`** (las solicitudes son formales, no borradores)
+- Contenedor asociado con ID: `10`
+- Campos de costo y ruta en `null` (se calcularán en el siguiente paso)
+- TarifaId: `2` (tarifa estándar $1435.99/km)
 
 **📝 Guarda:**
 - `id: 10` como `SOLICITUD_ID`
-- `rutaId` (creado automáticamente al crear la solicitud)
-- `contenedores[0].id` como `CONTENEDOR_ID`
+- `contenedor.id: 10` como `CONTENEDOR_ID`
 
 ---
 
-```
-
-### Paso 3: Consultar Ruta Creada Automáticamente  (Funciona)
-
-**ℹ️ Nota:** La ruta se crea automáticamente al crear la solicitud. No es necesario llamar a `/api/rutas/calcular` ya que esto generaría un error de constraint de unicidad (una solicitud solo puede tener una ruta).
+### Paso 3: Calcular Ruta para la Solicitud
 
 ```
-GET http://localhost:8080/api/rutas/solicitud/2
+POST http://localhost:8080/api/rutas/calcular
+Authorization: Bearer TOKEN_OPERADOR
+Content-Type: application/json
+
+{
+  "solicitudId": 10
+}
+```
+
+**Resultado esperado (201 Created):**
+```json
+{
+  "id": 20,
+  "solicitudId": 10,
+  "cantidadTramos": 1,
+  "cantidadDepositos": 0,
+  "distanciaTotalKm": 9.50,
+  "costoEstimado": 950.00,
+  "costoTotalReal": null,
+  "tiempoEstimadoHoras": 1,
+  "activa": true,
+  "tramos": [
+    {
+      "id": 40,
+      "orden": 1,
+      "origenTipo": "ORIGEN",
+      "origenDireccion": "Juan de Garay 1755, Córdoba",
+      "origenLatitud": -31.403771,
+      "origenLongitud": -64.163894,
+      "destinoTipo": "DESTINO",
+      "destinoDireccion": "De los Toscanos 6581, Córdoba",
+      "destinoLatitud": -31.340196,
+      "destinoLongitud": -64.224319,
+      "tipoTramo": "ORIGEN_DESTINO",
+      "estado": "ESTIMADO",
+      "distanciaKm": 9.50,
+      "costoAproximado": 950.00,
+      "tiempoEstimadoHoras": 1,
+      "camionId": null,
+      "fechaHoraInicio": null,
+      "fechaHoraFin": null,
+      "costoReal": null,
+      "tiempoRealHoras": null
+    }
+  ],
+  "fechaCreacion": "2025-11-14T16:06:15",
+  "fechaActualizacion": "2025-11-14T16:06:15"
+}
+```
+
+**✅ Validaciones:**
+- Ruta calculada con ID: `20`
+- **Distancia calculada:** 9.50 km (puede usar Google Maps Distance Matrix API o Haversine)
+- **Costo calculado:** $950.00 (9.50 km × $100/km de la tarifa ID 2)
+- **Tiempo estimado:** 1 hora
+- Tramo único (origen → destino directo, sin depósitos)
+- Estado del tramo: `ESTIMADO`
+- Camión no asignado aún
+
+**📌 IMPORTANTE:** Si intentas calcular ruta dos veces para la misma solicitud, obtendrás un error:
+```json
+{
+  "status": 500,
+  "message": "ERROR: duplicate key value violates unique constraint \"uk_ko3s4fkv5e7usn3jhsgawnjth\""
+}
+```
+**Solución:** Cada solicitud solo puede tener una ruta. Si necesitas recalcular, debes desactivar la ruta anterior primero.
+
+**📝 Guarda:**
+- `id: 20` como `RUTA_ID`
+- `tramos[0].id: 40` como `TRAMO_ID`
+
+#### 3.1 Verificar Sincronización con Solicitud
+
+```
+GET http://localhost:8080/api/solicitudes/10
 Authorization: Bearer TOKEN_OPERADOR
 ```
 
 **Resultado esperado (200 OK):**
 ```json
 {
-    "id": 2,
-    "solicitudId": 2,
-    "cantidadTramos": 1,
-    "cantidadDepositos": 0,
-    "distanciaTotalKm": 9.10,
-    "costoEstimado": 910.00,
-    "costoTotalReal": null,
-    "tiempoEstimadoHoras": 1,
-    "estado": null,
-    "activa": true,
-    "tramos": [
-        {
-            "id": 2,
-            "orden": 1,
-            "origenTipo": "ORIGEN",
-            "origenDireccion": "Juan de Garay 1755, Córdoba",
-            "destinoTipo": "DESTINO",
-            "destinoDireccion": "De los Toscanos 6581, Córdoba",
-            "tipoTramo": "ORIGEN_DESTINO",
-            "estado": "ESTIMADO",
-            "distanciaKm": 9.10,
-            "costoAproximado": 910.00,
-            "costoReal": null,
-            "fechaHoraInicioEstimada": null,
-            "fechaHoraFinEstimada": null,
-            "fechaHoraInicio": null,
-            "fechaHoraFin": null,
-            "observaciones": null,
-            "camionId": null
-        }
-    ],
-    "fechaCreacion": "2025-11-13T20:02:30.532628",
-    "fechaActualizacion": "2025-11-13T20:02:30.532665"
+  "id": 10,
+  "numero": "SOL-20251114160530",
+  "estado": "PENDIENTE",
+  "clienteId": 6,
+  "costoEstimado": 950.00,
+  "tiempoEstimadoHoras": 1,
+  "costoFinal": null,
+  "tiempoRealHoras": null,
+  "rutaId": 20,
+  "tarifaId": 2,
+  "fechaSolicitud": "2025-11-14T16:05:30",
+  "fechaProgramada": "2025-12-15"
 }
 ```
 
-**✅ Validaciones:**
-- Ruta creada automáticamente con la solicitud
-- **Distancia calculada usando Google Maps Distance Matrix API** (distancia real por carreteras)
-- **Costo calculado con tarifa real de la solicitud** (no valor hardcodeado)
-- Fórmula: `distanciaKm × precioPorKm` de la tarifa asociada
-- Ejemplo: Si distancia = 9.10 km y tarifa ID 2 tiene `precioPorKm: 1435.99`:
-  - Costo estimado = 9.10 × 1435.99 = **$13,067.51**
-- Tiempo estimado calculado según velocidad promedio (60 km/h)
-- Tramo único (origen → destino directo, sin depósitos intermedios)
-- Estado de la ruta: `PLANIFICADA`
-- Estado del tramo: `ESTIMADO`
-- Camión aún no asignado
-
-**🔧 Implementación técnica:**
-- Google Maps API Key configurada en `docker-compose.yml`
-- API: `https://maps.googleapis.com/maps/api/distancematrix/json`
-- Parámetros: `origins`, `destinations`, `mode=driving`, `units=metric`
-- Fallback: Si Google Maps falla, usa fórmula de Haversine (distancia en línea recta)
-- Tarifa obtenida dinámicamente desde `tarifas-service` usando `tarifaId` de la solicitud
-
-**📝 Guarda:**
-- `id: 2` como `RUTA_ID`
-- `tramos[0].id: 2` como `TRAMO_ID`
+**✅ Validación:** La solicitud se actualizó automáticamente con:
+- `costoEstimado`: 950.00
+- `tiempoEstimadoHoras`: 1
+- `rutaId`: 20
 
 
-### Paso 4: Asignar Camión al Tramo   (Funciona)
+### Paso 4: Asignar Camión al Tramo
 
 ```
 POST http://localhost:8080/api/rutas/tramos/40/asignar-camion
@@ -1670,51 +1729,78 @@ Content-Type: application/json
 **Resultado esperado (200 OK):**
 ```json
 {
-    "id": 2,
-    "orden": 1,
-    "origenTipo": "ORIGEN",
-    "origenDireccion": "Juan de Garay 1755, Córdoba",
-    "destinoTipo": "DESTINO",
-    "destinoDireccion": "De los Toscanos 6581, Córdoba",
-    "tipoTramo": "ORIGEN_DESTINO",
-    "estado": "ASIGNADO",
-    "distanciaKm": 9.10,
-    "costoAproximado": 910.00,
-    "costoReal": null,
-    "fechaHoraInicioEstimada": null,
-    "fechaHoraFinEstimada": null,
-    "fechaHoraInicio": null,
-    "fechaHoraFin": null,
-    "observaciones": null,
-    "camionId": 2
+  "id": 40,
+  "orden": 1,
+  "origenTipo": "ORIGEN",
+  "origenDireccion": "Juan de Garay 1755, Córdoba",
+  "destinoTipo": "DESTINO",
+  "destinoDireccion": "De los Toscanos 6581, Córdoba",
+  "tipoTramo": "ORIGEN_DESTINO",
+  "estado": "ASIGNADO",
+  "distanciaKm": 9.50,
+  "costoAproximado": 950.00,
+  "tiempoEstimadoHoras": 1,
+  "camionId": 2,
+  "fechaHoraInicio": null,
+  "fechaHoraFin": null,
+  "costoReal": null,
+  "tiempoRealHoras": null
 }
 ```
 
 **✅ Validaciones:**
 - Estado del tramo cambió: `ESTIMADO` → `ASIGNADO`
-- `camionId`: `2` 
+- `camionId`: `2` (Scania R450)
 
-#### 4.1 Verificar Estado del Camión
+#### 4.1 Verificar Actualización Automática del Estado de la Solicitud
+
+**🆕 NUEVO: Actualización Automática de Estados**
+
+Cuando asignas el primer camión a un tramo, el sistema automáticamente actualiza el estado de la solicitud de `PENDIENTE` a `PROGRAMADA`.
 
 ```
-GET http://localhost:8080/api/camiones/1
+GET http://localhost:8080/api/solicitudes/10
 Authorization: Bearer TOKEN_OPERADOR
 ```
 
 **Resultado esperado (200 OK):**
 ```json
 {
-  "id": 1,
-  "patente": "AA123BB",
-  "marca": "Mercedes-Benz",
-  "modelo": "Actros 2651",
-  "capacidadCarga": 15000,
-  "estado": "EN_RUTA",
+  "id": 10,
+  "numero": "SOL-20251114160530",
+  "estado": "PROGRAMADA",
+  "clienteId": 6,
+  "costoEstimado": 950.00,
+  "tiempoEstimadoHoras": 1,
+  "rutaId": 20
+}
+```
+
+**✅ Validación:** Estado cambió automáticamente: `PENDIENTE` → `PROGRAMADA`
+
+#### 4.2 Verificar Estado del Camión
+
+```
+GET http://localhost:8080/api/camiones/2
+Authorization: Bearer TOKEN_OPERADOR
+```
+
+**Resultado esperado (200 OK):**
+```json
+{
+  "id": 2,
+  "dominio": "AD788RT",
+  "marca": "Scania",
+  "modelo": "R450",
+  "año": 2020,
+  "transportistaId": 2,
+  "nombreTransportista": "Fran Molines Torrens",
+  "disponible": false,
   "activo": true
 }
 ```
 
-**✅ Validación:** Estado del camión cambió: `DISPONIBLE` → `EN_RUTA`
+**✅ Validación:** Estado del camión cambió: `disponible: true` → `disponible: false`
 
 ---
 
@@ -1741,8 +1827,8 @@ Authorization: Bearer TOKEN_TRANSPORTISTA
   "distanciaKm": 9.50,
   "costoAproximado": 950.00,
   "tiempoEstimadoHoras": 1,
-  "camionId": 1,
-  "fechaHoraInicio": "2025-11-12T16:10:00",
+  "camionId": 2,
+  "fechaHoraInicio": "2025-11-14T16:10:00",
   "fechaHoraFin": null,
   "costoReal": null,
   "tiempoRealHoras": null
@@ -1754,6 +1840,32 @@ Authorization: Bearer TOKEN_TRANSPORTISTA
 - `fechaHoraInicio`: registrada con timestamp actual
 - `fechaHoraFin`: aún `null`
 - `costoReal` y `tiempoRealHoras`: aún `null`
+
+#### 5.1 Verificar Actualización Automática del Estado de la Solicitud
+
+**🆕 NUEVO: Actualización Automática de Estados**
+
+Cuando inicias el primer tramo, el sistema automáticamente actualiza el estado de la solicitud de `PROGRAMADA` a `EN_TRANSITO`.
+
+```
+GET http://localhost:8080/api/solicitudes/10
+Authorization: Bearer TOKEN_OPERADOR
+```
+
+**Resultado esperado (200 OK):**
+```json
+{
+  "id": 10,
+  "numero": "SOL-20251114160530",
+  "estado": "EN_TRANSITO",
+  "clienteId": 6,
+  "costoEstimado": 950.00,
+  "tiempoEstimadoHoras": 1,
+  "rutaId": 20
+}
+```
+
+**✅ Validación:** Estado cambió automáticamente: `PROGRAMADA` → `EN_TRANSITO`
 
 ---
 
@@ -1784,9 +1896,9 @@ Authorization: Bearer TOKEN_TRANSPORTISTA
   "distanciaKm": 9.50,
   "costoAproximado": 950.00,
   "tiempoEstimadoHoras": 1,
-  "camionId": 1,
-  "fechaHoraInicio": "2025-11-12T16:10:00",
-  "fechaHoraFin": "2025-11-12T17:25:00",
+  "camionId": 2,
+  "fechaHoraInicio": "2025-11-14T16:10:00",
+  "fechaHoraFin": "2025-11-14T17:25:00",
   "costoReal": 950.00,
   "tiempoRealHoras": 1
 }
@@ -1794,11 +1906,19 @@ Authorization: Bearer TOKEN_TRANSPORTISTA
 
 **✅ Validaciones:**
 - Estado del tramo cambió: `INICIADO` → `FINALIZADO`
-- `fechaHoraFin`: registrada con timestamp actual
+- `fechaHoraInicio`: "2025-11-14T16:10:00"
+- `fechaHoraFin`: "2025-11-14T17:25:00"
 - `costoReal`: `950.00` (calculado: 9.50 km × $100/km)
-- `tiempoRealHoras`: `1` (diferencia entre inicio y fin)
+- `tiempoRealHoras`: `1` (diferencia entre inicio y fin, redondeado)
 
-#### 7.1 Verificar Sincronización Final con Solicitud
+#### 7.1 Verificar Sincronización Final con Solicitud y Actualización Automática
+
+**🆕 NUEVO: Actualización Automática de Estados**
+
+Cuando finalizas todos los tramos de una ruta, el sistema automáticamente:
+1. Actualiza el estado de la solicitud de `EN_TRANSITO` a `ENTREGADA`
+2. Registra la `fechaEntregaReal`
+3. Sincroniza `costoFinal` y `tiempoRealHoras`
 
 ```
 GET http://localhost:8080/api/solicitudes/10
@@ -1809,14 +1929,14 @@ Authorization: Bearer TOKEN_OPERADOR
 ```json
 {
   "id": 10,
-  "numero": "SOL-20251112160530",
-  "estado": "PENDIENTE",
-  "clienteId": 1,
+  "numero": "SOL-20251114160530",
+  "estado": "ENTREGADA",
+  "clienteId": 6,
   "contenedor": {
     "id": 10,
     "identificacion": "CONT-E2E-TEST-001",
-    "peso": 5000,
-    "volumen": 15,
+    "peso": 5000.00,
+    "volumen": 15.00,
     "direccionOrigen": "Juan de Garay 1755, Córdoba",
     "latitudOrigen": -31.403771,
     "longitudOrigen": -64.163894,
@@ -1829,40 +1949,58 @@ Authorization: Bearer TOKEN_OPERADOR
   "costoFinal": 950.00,
   "tiempoRealHoras": 1,
   "rutaId": 20,
-  "fechaCreacion": "2025-11-12T16:05:30"
+  "fechaSolicitud": "2025-11-14T16:05:30",
+  "fechaEntregaEstimada": "2025-12-15",
+  "fechaEntregaReal": "2025-11-14T17:25:00",
+  "activo": true
 }
 ```
 
 **✅ Validaciones Finales:**
-- `costoEstimado`: `950.00` (✅ calculado en Paso 3)
-- `tiempoEstimadoHoras`: `1` (✅ calculado en Paso 3)
-- `costoFinal`: `950.00` (✅ sincronizado desde tramo finalizado)
-- `tiempoRealHoras`: `1` (✅ sincronizado desde tramo finalizado)
-- `rutaId`: `20` (✅ asociada correctamente)
+- **Estado:** `ENTREGADA` (actualizado automáticamente)
+- `costoEstimado`: `950.00` (calculado en Paso 3)
+- `tiempoEstimadoHoras`: `1` (calculado en Paso 3)
+- `costoFinal`: `950.00` (sincronizado desde tramo finalizado)
+- `tiempoRealHoras`: `1` (sincronizado desde tramo finalizado)
+- `fechaEntregaReal`: "2025-11-14T17:25:00" (registrada automáticamente)
+- `rutaId`: `20` (asociada correctamente)
 
 **🎉 El sistema mantiene TODOS los datos sincronizados automáticamente**
+
+**📊 Flujo Completo de Estados de la Solicitud:**
+```
+PENDIENTE (creación) 
+   ↓ (asignar camión)
+PROGRAMADA 
+   ↓ (iniciar tramo)
+EN_TRANSITO 
+   ↓ (finalizar todos los tramos)
+ENTREGADA
+```
 
 #### 7.2 Verificar Estado Final del Camión
 
 ```
-GET http://localhost:8080/api/camiones/1
+GET http://localhost:8080/api/camiones/2
 Authorization: Bearer TOKEN_OPERADOR
 ```
 
 **Resultado esperado (200 OK):**
 ```json
 {
-  "id": 1,
-  "patente": "AA123BB",
-  "marca": "Mercedes-Benz",
-  "modelo": "Actros 2651",
-  "capacidadCarga": 15000,
-  "estado": "DISPONIBLE",
+  "id": 2,
+  "dominio": "AD788RT",
+  "marca": "Scania",
+  "modelo": "R450",
+  "año": 2020,
+  "transportistaId": 2,
+  "nombreTransportista": "Fran Molines Torrens",
+  "disponible": true,
   "activo": true
 }
 ```
 
-**✅ Validación:** Estado del camión volvió a `DISPONIBLE` (liberado después del tramo)
+**✅ Validación:** Estado del camión volvió a `disponible: true` (liberado después del tramo)
 
 ---
 
@@ -1918,14 +2056,16 @@ Authorization: Bearer TOKEN_OPERADOR
 
 ### Resumen del Flujo Ejecutado
 
-| Paso | Endpoint | Actor | Estado Inicial | Estado Final | Duración |
-|------|----------|-------|----------------|--------------|----------|
-| 1 | POST /solicitudes | Operador | - | PENDIENTE (solicitud creada) | - |
-| 2 | POST /rutas/calcular | Operador | PENDIENTE | PENDIENTE (ruta calculada) | - |
-| 3 | POST /tramos/{id}/asignar-camion | Operador | ESTIMADO | ASIGNADO | - |
-| 4 | POST /tramos/{id}/iniciar | Transportista | ASIGNADO | INICIADO | - |
-| 5 | POST /tramos/{id}/finalizar | Transportista | INICIADO | FINALIZADO | 1h 15min |
-| 6 | GET /solicitudes/{id} | Operador | - | Datos sincronizados | - |
+| Paso | Endpoint | Actor | Estado Solicitud | Estado Tramo | Actualización Automática |
+|------|----------|-------|------------------|--------------|--------------------------|
+| 1 | POST /solicitudes | Operador | **PENDIENTE** | - | Solicitud creada |
+| 2 | POST /rutas/calcular | Operador | PENDIENTE | **ESTIMADO** | Costos calculados |
+| 3 | POST /tramos/{id}/asignar-camion | Operador | **PENDIENTE → PROGRAMADA** ✅ | **ESTIMADO → ASIGNADO** | Estado actualizado automáticamente |
+| 4 | POST /tramos/{id}/iniciar | Transportista | **PROGRAMADA → EN_TRANSITO** ✅ | **ASIGNADO → INICIADO** | Estado actualizado automáticamente |
+| 5 | POST /tramos/{id}/finalizar | Transportista | **EN_TRANSITO → ENTREGADA** ✅ | **INICIADO → FINALIZADO** | Estado + fechaEntregaReal automáticos |
+| 6 | GET /solicitudes/{id} | Operador | ENTREGADA | FINALIZADO | Datos sincronizados |
+
+**🆕 Estados Automáticos:** Los estados de la solicitud se actualizan automáticamente según el progreso de los tramos, sin necesidad de llamadas manuales al endpoint PATCH /estado.
 
 ---
 
@@ -2007,6 +2147,79 @@ Esta guía proporciona:
 - Probar con diferentes coordenadas para verificar el cálculo de distancias
 - Verificar logs de cada servicio durante la ejecución
 - Usar diferentes tokens (operador, cliente, transportista) para validar seguridad
+
+---
+
+## 🆕 Cambios Importantes en el Sistema
+
+### 1. Estados Automáticos de Solicitudes
+
+**Antes:** Había que actualizar manualmente el estado de las solicitudes usando `PATCH /solicitudes/{id}/estado`.
+
+**Ahora:** Los estados se actualizan automáticamente según el progreso de los tramos:
+
+| Acción | Estado Anterior | Estado Nuevo | Automático |
+|--------|----------------|--------------|------------|
+| Crear solicitud | - | `PENDIENTE` | ✅ |
+| Asignar primer camión | `PENDIENTE` | `PROGRAMADA` | ✅ |
+| Iniciar primer tramo | `PROGRAMADA` | `EN_TRANSITO` | ✅ |
+| Finalizar todos los tramos | `EN_TRANSITO` | `ENTREGADA` | ✅ |
+
+**Beneficios:**
+- Menos llamadas API manuales
+- Consistencia garantizada entre tramos y solicitudes
+- Menos propenso a errores humanos
+
+### 2. Estado Inicial: PENDIENTE (no BORRADOR)
+
+**Antes:** Las solicitudes se creaban con estado `BORRADOR`.
+
+**Ahora:** Las solicitudes se crean con estado `PENDIENTE`.
+
+**Razón:** Las solicitudes son solicitudes formales que están pendientes de procesamiento, no borradores.
+
+### 3. Roles Simplificados
+
+**Antes:** Sistema tenía 4 roles (ADMIN, OPERADOR, CLIENTE, TRANSPORTISTA).
+
+**Ahora:** Sistema tiene 3 roles:
+- **OPERADOR:** Gestiona solicitudes, rutas, asignaciones (reemplaza ADMIN)
+- **CLIENTE:** Crea y consulta sus solicitudes
+- **TRANSPORTISTA:** Inicia y finaliza tramos
+
+**Operaciones DELETE:** Solo el rol `OPERADOR` puede eliminar recursos (eliminación lógica con `activo = false`).
+
+### 4. Constraint de Unicidad en Rutas
+
+**Importante:** Cada solicitud solo puede tener **una ruta activa**.
+
+Si intentas calcular una ruta dos veces para la misma solicitud, obtendrás:
+```json
+{
+  "status": 500,
+  "message": "ERROR: duplicate key value violates unique constraint"
+}
+```
+
+**Solución:** 
+- Cada solicitud debe tener solo una ruta
+- Si necesitas recalcular, primero desactiva la ruta anterior
+- La ruta se calcula con `POST /rutas/calcular` (una sola vez por solicitud)
+
+### 5. Flujo Simplificado End-to-End
+
+**Pasos mínimos para un traslado completo:**
+
+1. **POST /solicitudes** → Crea solicitud (estado: PENDIENTE)
+2. **POST /rutas/calcular** → Calcula ruta y costos
+3. **POST /tramos/{id}/asignar-camion** → Asigna camión (estado: PROGRAMADA automático)
+4. **POST /tramos/{id}/iniciar** → Inicia tramo (estado: EN_TRANSITO automático)
+5. **POST /tramos/{id}/finalizar** → Finaliza tramo (estado: ENTREGADA automático)
+
+**Ya no necesitas:**
+- ❌ Actualizar manualmente el estado de la solicitud
+- ❌ Llamar a endpoints adicionales de sincronización
+- ❌ Verificar manualmente la consistencia de datos
 
 ---
 
@@ -2094,6 +2307,157 @@ Esta guía proporciona:
 | direccionDestino | String | ✅ | Max 500 caracteres |
 | latitudDestino | Double | ✅ | Entre -90 y 90 |
 | longitudDestino | Double | ✅ | Entre -180 y 180 |
+
+---
+
+## Características Avanzadas Implementadas
+
+### 🌍 Google Maps Distance Matrix API
+
+El sistema integra la API de Google Maps para calcular distancias reales por carretera entre ubicaciones, proporcionando mayor precisión que el cálculo de línea recta (Haversine).
+
+**Configuración:**
+```yaml
+# docker-compose.yml - rutas-service
+environment:
+  GOOGLE_MAPS_API_KEY: AIzaSyAUp0j1WFgacoQYTKhtPI-CF6Ld7a7jHSg
+  GOOGLE_MAPS_ENABLED: true
+```
+
+**Funcionamiento:**
+- **Habilitado:** Utiliza Google Maps Distance Matrix API para obtener distancias reales
+- **Fallback:** Si la API falla o está deshabilitada, usa Haversine (línea recta)
+- **Parámetros API:** mode=driving, units=metric
+
+**Ejemplo de resultado:**
+```
+Origen: Aconquija 3200, Córdoba (-31.342516, -64.235711)
+Destino: De los Toscanos 6581, Córdoba (-31.361078, -64.212256)
+
+Distancia con Google Maps: 18.57 km (ruta por carretera)
+Distancia con Haversine: ~2.5 km (línea recta)
+
+Tiempo con Google Maps: 23 minutos → 1 hora (ceil)
+Tiempo con fallback: 18.57 ÷ 50 = 22 minutos → 1 hora (ceil)
+
+Diferencia en distancia: 7.4x más preciso
+```
+
+### 💰 Cálculo Dinámico de Tarifas
+
+El sistema calcula costos utilizando tarifas configurables en lugar de valores hardcodeados.
+
+**Flujo de cálculo:**
+
+1. **Crear Solicitud:** Se especifica `tarifaId`
+```json
+{
+  "clienteId": 1,
+  "tarifaId": 2,
+  "contenedor": { ... }
+}
+```
+
+2. **Calcular Ruta:** El servicio de rutas:
+   - Obtiene coordenadas de origen/destino de la solicitud
+   - Calcula distancia real con Google Maps API
+   - Obtiene tarifa desde `tarifas-service` usando el `tarifaId`
+   - Calcula costo: `distancia × tarifa.valor`
+
+3. **Resultado:**
+```json
+{
+  "distanciaTotalKm": 18.57,
+  "costoEstimado": 26666.33,
+  "costoTotalReal": null
+}
+```
+
+**Ejemplo de cálculo:**
+```
+Solicitud tiene tarifaId: 2
+
+Tarifa ID 2 (desde tarifas-service):
+{
+  "id": 2,
+  "tipo": "COSTO_KM_BASE",
+  "valor": 1435.99,
+  "activo": true
+}
+
+Cálculo:
+Distancia: 18.57 km (Google Maps)
+Tarifa: $1,435.99/km
+Costo Estimado: 18.57 × $1,435.99 = $26,666.33
+```
+
+**Comparación con sistema anterior:**
+```
+ANTES (hardcodeado):
+- Distancia: ~2.5 km (Haversine)
+- Tarifa: $100/km (hardcodeada)
+- Costo: $250
+
+AHORA (dinámico):
+- Distancia: 18.57 km (Google Maps)
+- Tarifa: $1,435.99/km (desde tarifas-service)
+- Costo: $26,666.33
+
+Mejora: 106x más preciso en costo total
+```
+
+### 📊 Costos Estimados vs Reales
+
+El sistema mantiene dos tipos de costos:
+
+**1. Costo Estimado (`costoEstimado`):**
+- Se calcula al crear la ruta
+- Usa distancia real (Google Maps) × tarifa configurada
+- Se almacena en la ruta y solicitud
+- Sirve para cotización y presupuesto
+
+**2. Costo Total Real (`costoTotalReal`):**
+- Se calcula al finalizar tramos
+- Suma los `costoReal` de todos los tramos finalizados
+- Se actualiza automáticamente al finalizar cada tramo
+- Sirve para facturación final
+
+**Flujo completo:**
+```
+1. Crear solicitud → tarifaId: 2
+2. Calcular ruta → costoEstimado: $26,666.33
+3. Asignar camión a tramo
+4. Iniciar tramo → costoReal: null
+5. Finalizar tramo → costoReal: $26,666.33
+6. Actualización automática → costoTotalReal: $26,666.33
+```
+
+**Implementación:**
+```java
+// Al finalizar un tramo, el sistema suma todos los costos reales
+BigDecimal costoTotalReal = ruta.getTramos().stream()
+    .filter(t -> t.getCostoReal() != null)
+    .map(Tramo::getCostoReal)
+    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+ruta.setCostoTotalReal(costoTotalReal);
+```
+
+### 🔐 Autenticación JWT en Cálculos
+
+Todas las operaciones de cálculo de rutas y costos requieren autenticación JWT:
+
+**Propagación de JWT entre servicios:**
+```
+Cliente → API Gateway → Rutas Service → Solicitudes Service
+   ↓                          ↓               ↓
+ Token JWT              Propaga JWT      Valida JWT
+                             ↓
+                      Tarifas Service
+                      Valida JWT y devuelve tarifa
+```
+
+El `RestTemplate` en `rutas-service` automáticamente propaga el JWT a los servicios downstream.
 
 ---
 

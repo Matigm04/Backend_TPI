@@ -10,6 +10,7 @@ com\logistica\rutas\config\OpenApiConfig.class
 com\logistica\rutas\model\EstadoTramo.class
 com\logistica\rutas\dto\googlemaps\GoogleMapsDistanceResponse$Element.class
 com\logistica\rutas\dto\ActualizarCostosDTO$ActualizarCostosDTOBuilder.class
+com\logistica\rutas\dto\DistanciaYTiempoDTO$DistanciaYTiempoDTOBuilder.class
 com\logistica\rutas\service\GoogleMapsService.class
 com\logistica\rutas\dto\RutaRequestDTO.class
 com\logistica\rutas\exception\GlobalExceptionHandler.class
@@ -24,6 +25,7 @@ com\logistica\rutas\exception\GlobalExceptionHandler$ErrorResponse.class
 com\logistica\rutas\model\Tramo$TramoBuilder.class
 com\logistica\rutas\dto\googlemaps\GoogleMapsDistanceRequest$GoogleMapsDistanceRequestBuilder.class
 com\logistica\rutas\model\Ruta.class
+com\logistica\rutas\dto\DistanciaYTiempoDTO.class
 com\logistica\rutas\dto\TramoResponseDTO$TramoResponseDTOBuilder.class
 com\logistica\rutas\dto\TramoResponseDTO.class
 com\logistica\rutas\dto\RutaResponseDTO$RutaResponseDTOBuilder.class

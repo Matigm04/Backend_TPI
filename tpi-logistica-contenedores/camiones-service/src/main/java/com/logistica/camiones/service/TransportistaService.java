@@ -25,7 +25,7 @@ public class TransportistaService {
     }
 
     public TransportistaDTO obtenerPorId(Long id) {
-        Transportista transportista = transportistaRepository.findByIdAndActivoTrue(id)
+        Transportista transportista = transportistaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Transportista no encontrado con id: " + id));
         return convertirADTO(transportista);
     }

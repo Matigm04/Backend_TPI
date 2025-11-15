@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ public class CamionController {
     private final CamionService camionService;
     
     @PostMapping
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Crear un nuevo camión", description = "Registra un nuevo camión en el sistema")
     public ResponseEntity<CamionResponseDTO> crearCamion(@Valid @RequestBody CamionRequestDTO request) {
         CamionResponseDTO response = camionService.crearCamion(request);
@@ -61,6 +63,7 @@ public class CamionController {
     }
     
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Actualizar camión", description = "Actualiza los datos de un camión existente")
     public ResponseEntity<CamionResponseDTO> actualizarCamion(
             @PathVariable Long id,
@@ -70,6 +73,7 @@ public class CamionController {
     }
     
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Eliminar camión", description = "Desactiva un camión del sistema")
     public ResponseEntity<Void> eliminarCamion(@PathVariable Long id) {
         camionService.eliminarCamion(id);

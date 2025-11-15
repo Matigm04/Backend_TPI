@@ -46,8 +46,8 @@ public class DepositoService {
 
     @Transactional(readOnly = true)
     public List<DepositoResponseDTO> listarTodos() {
-        log.info("Listando todos los depósitos");
-        return depositoRepository.findAll().stream()
+        log.info("Listando todos los depósitos activos");
+        return depositoRepository.findByActivoTrue().stream()
                 .map(DepositoResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }

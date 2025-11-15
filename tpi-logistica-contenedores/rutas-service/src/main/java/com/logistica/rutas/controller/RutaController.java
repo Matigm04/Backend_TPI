@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class RutaController {
     private final RutaService rutaService;
 
     @PostMapping("/calcular")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Calcular ruta tentativa", 
                description = "Calcula una ruta tentativa con todos los tramos y costos estimados")
     public ResponseEntity<RutaResponseDTO> calcularRutaTentativa(@Valid @RequestBody RutaRequestDTO request) {
@@ -54,6 +56,7 @@ public class RutaController {
     }
 
     @PostMapping("/tramos/{tramoId}/asignar-camion")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Asignar camión a tramo")
     public ResponseEntity<TramoResponseDTO> asignarCamionATramo(
             @PathVariable Long tramoId,
@@ -63,6 +66,7 @@ public class RutaController {
     }
 
     @PostMapping("/tramos/{tramoId}/iniciar")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'TRANSPORTISTA')")
     @Operation(summary = "Iniciar tramo", description = "Registra el inicio de un tramo por parte del transportista")
     public ResponseEntity<TramoResponseDTO> iniciarTramo(@PathVariable Long tramoId) {
         TramoResponseDTO response = rutaService.iniciarTramo(tramoId);
@@ -70,6 +74,7 @@ public class RutaController {
     }
 
     @PostMapping("/tramos/{tramoId}/finalizar")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'TRANSPORTISTA')")
     @Operation(summary = "Finalizar tramo", description = "Registra la finalización de un tramo")
     public ResponseEntity<TramoResponseDTO> finalizarTramo(@PathVariable Long tramoId) {
         TramoResponseDTO response = rutaService.finalizarTramo(tramoId);
@@ -84,6 +89,7 @@ public class RutaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('OPERADOR')")
     @Operation(summary = "Desactivar ruta", 
                description = "Desactiva una ruta (soft delete). No permite desactivar rutas con tramos en proceso.")
     public ResponseEntity<Void> desactivarRuta(@PathVariable Long id) {

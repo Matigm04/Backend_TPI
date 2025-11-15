@@ -1,7 +1,7 @@
 package com.logistica.solicitudes.model;
 
 public enum EstadoSolicitud {
-    BORRADOR,
+    PENDIENTE,
     PROGRAMADA,
     EN_TRANSITO,
     ENTREGADA,
