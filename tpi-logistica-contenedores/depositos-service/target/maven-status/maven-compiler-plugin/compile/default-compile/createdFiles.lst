@@ -11,3 +11,4 @@ com\logistica\depositos\exception\ErrorResponse.class
 com\logistica\depositos\exception\GlobalExceptionHandler.class
 com\logistica\depositos\dto\DepositoCercanoDTO.class
 com\logistica\depositos\dto\DepositoResponseDTO.class
+com\logistica\depositos\config\WebConfig.class

@@ -1,4 +1,6 @@
 com\logistica\gateway\config\GatewayConfig.class
 com\logistica\gateway\controller\FallbackController.class
-com\logistica\gateway\filter\LoggingGlobalFilter.class
 com\logistica\gateway\ApiGatewayApplication.class
+com\logistica\gateway\filter\LoggingGlobalFilter.class
+com\logistica\gateway\filter\Utf8EncodingFilter$1.class
+com\logistica\gateway\filter\Utf8EncodingFilter.class

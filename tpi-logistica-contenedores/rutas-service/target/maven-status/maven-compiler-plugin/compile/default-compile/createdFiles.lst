@@ -1,5 +1,6 @@
 com\logistica\rutas\model\Ruta$RutaBuilder.class
 com\logistica\rutas\dto\ContenedorDTO.class
+com\logistica\rutas\config\WebConfig.class
 com\logistica\rutas\model\Tramo.class
 com\logistica\rutas\dto\googlemaps\GoogleMapsDistanceResponse$Distance.class
 com\logistica\rutas\dto\googlemaps\GoogleMapsDistanceResponse.class

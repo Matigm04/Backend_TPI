@@ -7,6 +7,7 @@ C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-l
 C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-logistica-contenedores\solicitudes-service\src\main\java\com\logistica\solicitudes\dto\HistorialEstadoContenedorRequestDTO.java
 C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-logistica-contenedores\solicitudes-service\src\main\java\com\logistica\solicitudes\config\RestTemplateConfig.java
 C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-logistica-contenedores\solicitudes-service\src\main\java\com\logistica\solicitudes\exception\ContenedorDuplicadoException.java
+C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-logistica-contenedores\solicitudes-service\src\main\java\com\logistica\solicitudes\config\WebConfig.java
 C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-logistica-contenedores\solicitudes-service\src\main\java\com\logistica\solicitudes\model\Solicitud.java
 C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-logistica-contenedores\solicitudes-service\src\main\java\com\logistica\solicitudes\dto\SeguimientoDTO.java
 C:\matig\Facultad\FACULTAD\Tercer Año\Backend de Aplicaciones\Backend_TPI\tpi-logistica-contenedores\solicitudes-service\src\main\java\com\logistica\solicitudes\exception\SolicitudNotFoundException.java

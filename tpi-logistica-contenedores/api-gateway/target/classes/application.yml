@@ -1,5 +1,11 @@
 server:
   port: 8080
+  # Forzar codificación UTF-8 en todas las respuestas
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   application:
@@ -98,7 +104,17 @@ spring:
             allowedHeaders: "*"
             exposedHeaders:
               - Authorization
+              - Content-Type
             maxAge: 3600
+      
+      # Configuración de codificación
+      codec:
+        max-in-memory-size: 10MB
+      httpclient:
+        wiretap: false
+        # Asegurar UTF-8 en las conexiones HTTP
+        pool:
+          max-connections: 100
 
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin

@@ -10,4 +10,5 @@ com\logistica\tarifas\exception\TarifaNotFoundException.class
 com\logistica\tarifas\TarifasServiceApplication.class
 com\logistica\tarifas\dto\TarifaResponseDTO.class
 com\logistica\tarifas\model\Tarifa.class
+com\logistica\tarifas\config\WebConfig.class
 com\logistica\tarifas\service\TarifaService.class
